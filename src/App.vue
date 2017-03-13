@@ -3,9 +3,9 @@
     <div class="page-header">
       <h1>Vue-color-picker</h1>
       <h2>基于Vue2.0的颜色选择器插件</h2>
-      <a href="#" class="btn">View on GitHub</a>
-      <a href="#" class="btn">下载整个项目</a>
-      <a href="#" class="btn">只下载插件</a>
+      <a href="https://github.com/zuley/vue-color-picker" class="btn" target="_blank">View on GitHub</a>
+      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.all.zip" class="btn" target="_blank">下载整个项目</a>
+      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.zip" class="btn" target="_blank">只下载插件</a>
     </div>
     <div class="page-content">
       <h1>Vue-color-picker</h1>
@@ -32,7 +32,7 @@ Vue.use(colorPicker)
 // 在组件的 temelate 中直接使用
 &lt;colorPicker v-model=&quot;color&quot;&gt;&lt;/colorPicker&gt;
 </pre>
-      <h3>以组件的时候安装</h3>
+      <h3>以组件的形式安装</h3>
 <pre>// 在组件中导入插件
 import colorPicker from './plugin/vue-color-picker/colorPicker'
 // 在组件中注册插件
@@ -53,6 +53,7 @@ export default {
 <pre>&lt;colorPicker v-model=&quot;color&quot; v-on:change=&quot;headleChangeColor&quot;&gt;&lt;/colorPicker
 </pre>
     </div>
+    <div class="page-footer">Vue-color-picker 插件由<a href="http://www.rxshc.com/" target="_blank">猪不乐意</a>编写</div>
   </div>
 </template>
 

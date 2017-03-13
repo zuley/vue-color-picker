@@ -46,6 +46,7 @@ h1,h2,h3,h4,h5,h6{ font-weight: normal; margin: 0; padding: 0px; }
   padding: 0 30px;
   font-size: 16px;
   line-height: 1.8;
+  margin-bottom: 50px;
   h1,h2{
     margin-top: 20px;
     margin-bottom: 10px;
@@ -66,4 +67,14 @@ h1,h2,h3,h4,h5,h6{ font-weight: normal; margin: 0; padding: 0px; }
     padding: 15px;
     border-radius: 4px;
   }
+}
+
+.page-footer{
+  text-align: center;
+  line-height: 60px;
+  background: #f8f8f8;
+  color: #999;
+  font-size: 14px;
+  a{ margin: 0 5px; color: #999; transition: color .3s ease; }
+  a:hover{ color: #159957; }
 }
