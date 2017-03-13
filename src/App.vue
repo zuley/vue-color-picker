@@ -50,7 +50,7 @@ export default {
       </ol>
       <h2>事件</h2>
       <p><code>change</code>颜色值改变的时候触发</p>
-<pre>&lt;colorPicker v-model=&quot;color&quot; v-on:change=&quot;headleChangeColor&quot;&gt;&lt;/colorPicker
+<pre>&lt;colorPicker v-model=&quot;color&quot; v-on:change=&quot;headleChangeColor&quot;&gt;&lt;/colorPicker&gt;
 </pre>
     </div>
     <div class="page-footer">Vue-color-picker 插件由<a href="http://www.rxshc.com/" target="_blank">猪不乐意</a>编写</div>
