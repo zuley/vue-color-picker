@@ -4,8 +4,8 @@
       <h1>Vue-color-picker</h1>
       <h2>基于Vue2.0的颜色选择器插件</h2>
       <a href="https://github.com/zuley/vue-color-picker" class="btn" target="_blank">View on GitHub</a>
-      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.all.zip" class="btn" target="_blank">下载整个项目</a>
-      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.zip" class="btn" target="_blank">只下载插件</a>
+      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.all.zip" class="btn">下载整个项目</a>
+      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.zip" class="btn">只下载插件</a>
     </div>
     <div class="page-content">
       <h1>Vue-color-picker</h1>
