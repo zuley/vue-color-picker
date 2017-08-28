@@ -10,6 +10,8 @@ import colorPicker from './plugin/vue-color-picker'
 // 注册插件
 Vue.use(colorPicker)
 
+console.log('测试分支')
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
