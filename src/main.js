@@ -3,6 +3,8 @@
 import Vue from 'vue'
 import App from './App'
 
+console.log('测试分支第二次提交')
+
 Vue.config.productionTip = false
 
 // 导入插件
