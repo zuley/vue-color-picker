@@ -5,6 +5,7 @@ import App from './App'
 
 console.log('主分支修改')
 console.log('主分支第二次修改')
+console.log('测试分支第二次提交')
 
 Vue.config.productionTip = false
 
@@ -12,6 +13,8 @@ Vue.config.productionTip = false
 import colorPicker from './plugin/vue-color-picker'
 // 注册插件
 Vue.use(colorPicker)
+
+console.log('测试分支')
 
 /* eslint-disable no-new */
 new Vue({
