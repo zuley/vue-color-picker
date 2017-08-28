@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 
 console.log('主分支修改')
+console.log('主分支第二次修改')
 
 Vue.config.productionTip = false
 
