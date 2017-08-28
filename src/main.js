@@ -3,6 +3,8 @@
 import Vue from 'vue'
 import App from './App'
 
+console.log('主分支修改')
+
 Vue.config.productionTip = false
 
 // 导入插件
