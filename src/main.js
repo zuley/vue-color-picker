@@ -3,11 +3,8 @@
 import Vue from 'vue'
 import App from './App'
 
-<<<<<<< HEAD
 console.log('创建分支test')
-=======
 console.log('准备把主分支合并到测试分支')
->>>>>>> master
 
 Vue.config.productionTip = false
 
