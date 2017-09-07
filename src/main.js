@@ -3,9 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 
-console.log('主分支修改')
-console.log('主分支第二次修改')
-console.log('测试分支第二次提交')
+console.log('创建分支test')
 
 Vue.config.productionTip = false
 
