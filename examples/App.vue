@@ -59,7 +59,6 @@ export default {
 
 <script>
 export default {
-  name: 'app',
   data () {
     return {
       color: '#f00'
@@ -74,5 +73,6 @@ export default {
 </script>
 
 <style lang="sass">
-@import "assets/style.scss"
+@import "assets/style.scss";
 </style>
+  

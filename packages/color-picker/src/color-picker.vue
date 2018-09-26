@@ -25,7 +25,8 @@
         <h3>主题颜色</h3>
         <ul class="tColor">
           <li
-            v-for="color of tColor"
+            v-for="(color, index) of tColor"
+            :key="index"
             v-bind:style="{ backgroundColor: color }"
             v-on:mouseover="hoveColor = color"
             v-on:mouseout="hoveColor = null"
@@ -33,10 +34,11 @@
           ></li>
         </ul>
         <ul class="bColor">
-          <li v-for="item of colorPanel">
+          <li v-for="(item, index) of colorPanel" :key="index">
             <ul>
               <li
-                v-for="color of item"
+                v-for="(color, cindex) of item"
+                :key="cindex"
                 v-bind:style="{ backgroundColor: color }"
                 v-on:mouseover="hoveColor = color"
                 v-on:mouseout="hoveColor = null"
@@ -48,7 +50,8 @@
         <h3>标准颜色</h3>
         <ul class="tColor">
           <li
-            v-for="color of bColor"
+            v-for="(color, index) of bColor"
+            :key="index"
             v-bind:style="{ backgroundColor: color }"
             v-on:mouseover="hoveColor = color"
             v-on:mouseout="hoveColor = null"
@@ -190,7 +193,7 @@ export default {
   },
   mounted () {
     // 点击页面上其他地方，关闭弹窗
-    document.onclick = (e) => {
+    document.onclick = () => {
       this.openStatus = false
     }
   }
@@ -227,3 +230,4 @@ export default {
   }
 }
 </style>
+  
