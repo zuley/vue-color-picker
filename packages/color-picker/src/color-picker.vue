@@ -76,7 +76,7 @@ export default {
     // 默认颜色
     defaultColor: {
       type: String,
-      default: '#000'
+      default: '#000000'
     },
     // 禁用状态
     disabled: {
@@ -91,7 +91,7 @@ export default {
       // 鼠标经过的颜色块
       hoveColor: null,
       // 主题颜色
-      tColor: ['#000', '#fff', '#eeece1', '#1e497b', '#4e81bb', '#e2534d', '#9aba60', '#8165a0', '#47acc5', '#f9974c'],
+      tColor: ['#000000', '#ffffff', '#eeece1', '#1e497b', '#4e81bb', '#e2534d', '#9aba60', '#8165a0', '#47acc5', '#f9974c'],
       // 颜色面板
       colorConfig: [
         ['#7f7f7f', '#f2f2f2'],
@@ -209,13 +209,13 @@ export default {
   .colorBtn.disabled{ cursor: no-drop; }
   .box{
     position: absolute; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 2px; padding: 10px; padding-bottom: 5px; box-shadow: 0 0 5px rgba(0,0,0,.15); opacity: 0; transition: all .3s ease;
-    h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; }
+    h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: #333; }
   }
   .box.open{ visibility: visible; opacity: 1; }
   .hd{
     overflow: hidden; line-height: 29px;
     .colorView{ width: 100px; height: 30px; float: left; transition: background-color .3s ease; }
-    .defaultColor{ width: 80px; float: right; text-align: center; border: 1px solid #ddd; cursor: pointer; }
+    .defaultColor{ width: 80px; float: right; text-align: center; border: 1px solid #ddd; cursor: pointer; color: #333; }
   }
   .tColor{
     li{ width: 15px; height: 15px; display: inline-block; margin: 0 2px; transition: all .3s ease; }
