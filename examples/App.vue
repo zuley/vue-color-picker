@@ -4,10 +4,8 @@
       <h1>Vue-color-picker</h1>
       <h2>基于Vue2.0的颜色选择器插件</h2>
       <a href="https://github.com/zuley/vue-color-picker" class="btn" target="_blank">View on GitHub</a>
-      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.all.zip" class="btn">下载整个项目</a>
-      <a href="http://zly-public-files.oss-cn-shenzhen.aliyuncs.com/github/vue-color-picker.zip" class="btn">只下载插件</a>
     </div>
-    <div class="page-content">
+    <div class="page-content" v-hljs>
       <h1>Vue-color-picker</h1>
       <p>本插件仿照<code>Angular</code>的<code><a href="http://zhangbobell.github.io/color-picker/" target="_blank">color-picker</a></code>插件制作</p>
       <h2>Demo</h2>
@@ -15,33 +13,30 @@
       <h2>特点</h2>
       <ol>
         <li>简单易用，UI在原插件基础上优化增加了圆角和过渡动画</li>
-        <li>提供以插件的形式安装提供全局组件</li>
-        <li>提供单独以组件的方式按需引入</li>
+        <li>提供以 npm 的形式安装提供全局组件</li>
         <li>在支持 html5 input[type='color'] 的浏览器实现了「更多颜色」的功能</li>
       </ol>
-      <h2>获取</h2>
-      <p>你可以直接下载整个项目，然后提取其中的<code>/src/plugin/vue-color-picker</code>目录使用。</p>
-      <p>也可以直接只下载插件</p>
-      <h2>用法</h2>
-      <h3>以插件的形式安装</h3>
-<pre>// 导入插件
-import colorPicker from './plugin/vue-color-picker'
-// 注册插件
-Vue.use(colorPicker)
-
-// 在组件的 temelate 中直接使用
-&lt;colorPicker v-model=&quot;color&quot;&gt;&lt;/colorPicker&gt;
+      <h2>安装</h2>
+      <pre>$ npm install vcolorpicker -S</pre>
+      <h2>使用</h2>
+      <h3>在 `main.js` 文件中引入插件并注册</h3>
+<pre># main.js
+import vcolorpicker from 'vcolorpicker'
+Vue.use(vcolorpicker)
 </pre>
-      <h3>以组件的形式安装</h3>
-<pre>// 在组件中导入插件
-import colorPicker from './plugin/vue-color-picker/colorPicker'
-// 在组件中注册插件
-export default {
-  components: { colorPicker }
-}
-// 在组件的 temelate 中直接使用
-&lt;colorPicker v-model=&quot;color&quot;&gt;&lt;/colorPicker&gt;
-</pre>
+      <h3>在项目中使用 vcolorpicker</h3>
+<pre>&lt;template&gt;
+  &lt;colorPicker v-model=&quot;color&quot; /&gt;
+&lt;/template&gt;
+&lt;script&gt;
+  export default {
+    data () {
+      return {
+        color: &#x27;#ff0000&#x27;
+      }
+    }
+  }
+&lt;/script&gt;</pre>
       <h2>选项</h2>
       <p>你可以通过在所在的元素上设置以下属性来配置<code>color-picker</code></p>
       <ol>
@@ -61,7 +56,7 @@ export default {
 export default {
   data () {
     return {
-      color: '#f00'
+      color: '#ff0000'
     }
   },
   methods: {
