@@ -1,6 +1,8 @@
-# vcolorpicker
+# vColorPicker
 
 > 基于Vue的颜色选择器插件
+
+[DEMO 演示](http://vue-color-picker.rxshc.com/)
 
 ## 安装
 
