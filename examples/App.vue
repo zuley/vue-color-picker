@@ -1,12 +1,12 @@
 <template>
   <div id="app">
     <div class="page-header">
-      <h1>Vue-color-picker</h1>
-      <h2>基于Vue2.0的颜色选择器插件</h2>
+      <h1>vColorPicker</h1>
+      <h2>基于 Vue 的颜色选择器插件</h2>
       <a href="https://github.com/zuley/vue-color-picker" class="btn" target="_blank">View on GitHub</a>
     </div>
     <div class="page-content" v-hljs>
-      <h1>Vue-color-picker</h1>
+      <h1>vColorPicker</h1>
       <p>本插件仿照<code>Angular</code>的<code><a href="http://zhangbobell.github.io/color-picker/" target="_blank">color-picker</a></code>插件制作</p>
       <h2>Demo</h2>
       <colorPicker v-model="color" v-on:change="headleChangeColor"></colorPicker>
