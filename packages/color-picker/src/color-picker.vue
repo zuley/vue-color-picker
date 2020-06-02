@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="m-colorPicker" ref="colorPicker" v-on:click="event => { event.stopPropagation() }">
+  <div class="m-colorPicker" tabindex="-1" @blur="closePanel()" ref="colorPicker" v-on:click="event => { event.stopPropagation() }">
     <!-- 颜色显示小方块 -->
     <div class="colorBtn"
       v-bind:style="`background-color: ${showColor}`"
@@ -137,6 +137,9 @@ export default {
     }
   },
   methods: {
+    closePanel() {
+      this.openStatus = false
+    },
     triggerHtml5Color () {
       this.$refs.html5Color.click()
     },
@@ -193,9 +196,9 @@ export default {
   },
   mounted () {
     // 点击页面上其他地方，关闭弹窗
-    document.onclick = () => {
-      this.openStatus = false
-    }
+    // document.onclick = () => {
+    //   this.openStatus = false
+    // }
   }
 }
 </script>
@@ -211,7 +214,7 @@ export default {
     position: absolute; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 2px; padding: 10px; padding-bottom: 5px; box-shadow: 0 0 5px rgba(0,0,0,.15); opacity: 0; transition: all .3s ease;
     h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: #333; }
   }
-  .box.open{ visibility: visible; opacity: 1; }
+  .box.open{ visibility: visible; opacity: 1;z-index: 1; }
   .hd{
     overflow: hidden; line-height: 29px;
     .colorView{ width: 100px; height: 30px; float: left; transition: background-color .3s ease; }
