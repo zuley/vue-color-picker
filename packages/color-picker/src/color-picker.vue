@@ -193,12 +193,6 @@ export default {
       }
       return gradientColorArr
     }
-  },
-  mounted () {
-    // 点击页面上其他地方，关闭弹窗
-    // document.onclick = () => {
-    //   this.openStatus = false
-    // }
   }
 }
 </script>
@@ -206,6 +200,7 @@ export default {
 <style lang="scss" scoped>
 .m-colorPicker{
   position: relative; text-align: left; font-size: 14px; display: inline-block;
+  outline: none;
   ul,li,ol{ list-style: none; margin: 0; padding: 0; }
   input{ display: none; }
   .colorBtn{ width: 15px; height: 15px; }
