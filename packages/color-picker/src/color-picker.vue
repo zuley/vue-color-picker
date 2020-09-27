@@ -207,6 +207,7 @@ export default {
   .colorBtn.disabled{ cursor: no-drop; }
   .box{
     position: absolute; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 2px; padding: 10px; padding-bottom: 5px; box-shadow: 0 0 5px rgba(0,0,0,.15); opacity: 0; transition: all .3s ease;
+    box-sizing: content-box;
     h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: #333; }
   }
   .box.open{ visibility: visible; opacity: 1;z-index: 1; }

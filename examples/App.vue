@@ -9,7 +9,8 @@
       <h1>vColorPicker</h1>
       <p>本插件仿照<code>Angular</code>的<code><a href="http://zhangbobell.github.io/color-picker/" target="_blank">color-picker</a></code>插件制作</p>
       <h2>Demo</h2>
-      <colorPicker v-model="color" v-on:change="headleChangeColor"></colorPicker>
+      <colorPicker v-model="color" v-on:change="headleChangeColor"></colorPicker>&nbsp;
+      <colorPicker v-model="color2"></colorPicker>
       <h2>特点</h2>
       <ol>
         <li>简单易用，UI在原插件基础上优化增加了圆角和过渡动画</li>
@@ -56,7 +57,8 @@ Vue.use(vcolorpicker)
 export default {
   data () {
     return {
-      color: '#ff0000'
+      color: '#ff0000',
+      color2: '#000000'
     }
   },
   methods: {
