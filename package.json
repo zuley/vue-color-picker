@@ -4,6 +4,7 @@
   "description": "基于 Vue 的颜色选择器",
   "main": "lib/vcolorpicker.umd.min.js",
   "keyword": "vcolorpicker colorpicker color-picker",
+  "homepage": "https://github.com/zuley/vue-color-picker",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
