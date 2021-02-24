@@ -1,6 +1,6 @@
 {
   "name": "vcolorpicker",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "基于 Vue 的颜色选择器",
   "main": "lib/vcolorpicker.umd.min.js",
   "keyword": "vcolorpicker colorpicker color-picker",
