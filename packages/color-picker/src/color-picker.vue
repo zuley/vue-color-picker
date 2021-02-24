@@ -1,13 +1,13 @@
 <template lang="html">
-  <div class="m-colorPicker" tabindex="-1" @blur="closePanel()" ref="colorPicker" v-on:click="event => { event.stopPropagation() }">
+  <div class="m-colorPicker"  ref="colorPicker" v-clickoutside="closePanel" v-on:click="event => { event.stopPropagation() }">
     <!-- 颜色显示小方块 -->
     <div class="colorBtn"
       v-bind:style="`background-color: ${showColor}`"
-      v-on:click="openStatus = !disabled"
+      v-on:click="openPanel"
       v-bind:class="{ disabled: disabled }"
     ></div>
     <!-- 颜色色盘 -->
-    <div class="box" v-bind:class="{ open: openStatus }">
+    <div class="box" v-bind:class="{ open: openStatus }" >
       <div class="hd">
         <div class="colorView" v-bind:style="`background-color: ${showPanelColor}`"></div>
         <div class="defaultColor"
@@ -65,8 +65,13 @@
 </template>
 
 <script>
+import clickoutside from '../../directive/clickoutside'
+
 export default {
   name: 'colorPicker',
+  directives: {
+    clickoutside
+  },
   props: {
     // 当前颜色值
     value: {
@@ -137,6 +142,9 @@ export default {
     }
   },
   methods: {
+    openPanel () {
+      this.openStatus = !this.disabled
+    },
     closePanel() {
       this.openStatus = false
     },
