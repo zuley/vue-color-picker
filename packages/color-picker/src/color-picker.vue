@@ -6,11 +6,6 @@
       v-on:click="openStatus = !disabled"
       v-bind:class="{ disabled: disabled }"
     ></div>
-    <!-- 用以激活HTML5颜色面板 -->
-    <input type="color"
-      ref="html5Color"
-      v-model="html5Color"
-      v-on:change="updataValue(html5Color)">
     <!-- 颜色色盘 -->
     <div class="box" v-bind:class="{ open: openStatus }">
       <div class="hd">
@@ -59,6 +54,11 @@
           ></li>
         </ul>
         <h3 v-on:click="triggerHtml5Color">更多颜色...</h3>
+        <!-- 用以激活HTML5颜色面板 -->
+        <input type="color"
+          ref="html5Color"
+          v-model="html5Color"
+          v-on:change="updataValue(html5Color)">
       </div>
     </div>
   </div>
@@ -202,13 +202,18 @@ export default {
   position: relative; text-align: left; font-size: 14px; display: inline-block;
   outline: none;
   ul,li,ol{ list-style: none; margin: 0; padding: 0; }
-  input{ display: none; }
   .colorBtn{ width: 15px; height: 15px; }
   .colorBtn.disabled{ cursor: no-drop; }
   .box{
     position: absolute; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 2px; padding: 10px; padding-bottom: 5px; box-shadow: 0 0 5px rgba(0,0,0,.15); opacity: 0; transition: all .3s ease;
     box-sizing: content-box;
     h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: #333; }
+    input {
+      visibility: hidden;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+    }
   }
   .box.open{ visibility: visible; opacity: 1;z-index: 1; }
   .hd{
