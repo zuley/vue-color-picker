@@ -1,7 +1,11 @@
 {
   "name": "vcolorpicker",
-  "version": "0.0.0",
-  "private": true,
+  "description": "基于 Vue3 的颜色选择器",
+  "main": "",
+  "keyword": "vcolorpicker colorpicker color-picker vue-color-picker",
+  "homepage": "https://github.com/zuley/vue-color-picker",
+  "version": "2.0.0",
+  "private": false,
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
