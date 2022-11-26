@@ -1,21 +1,24 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+// 配置详情参考 https://aka.ms/devcontainer.json
 {
+	// 名称
 	"name": "Node.js & TypeScript",
-	"image": "mcr.microsoft.com/devcontainers/typescript-node:18"
+	// 镜像
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:18",
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	// 要添加到开发容器的功能。 更多查看： https://containers.dev/features.
+	"features": {
+		"ghcr.io/NicoVIII/devcontainer-features/pnpm:1": {}
+	}
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// 本地端口映射
 	// "forwardPorts": [],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
+	// 容器创建后使用 postCreateCommand 运行命令
 	// "postCreateCommand": "yarn install",
 
-	// Configure tool-specific properties.
+	// 辅助工具配置
 	// "customizations": {},
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// 取消下方注释，使用 root 用户连接. 更多信息: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
