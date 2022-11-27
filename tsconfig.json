@@ -1,6 +1,6 @@
 {
   "extends": "@vue/tsconfig/tsconfig.web.json",
-  "include": ["env.d.ts", "examples/**/*", "examples/**/*.vue"],
+  "include": ["env.d.ts", "examples/**/*", "examples/**/*.vue", "packages/**/*", "packages/**/*.vue"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
