@@ -1,5 +1,12 @@
 
 
+# [2.2.0](https://github.com/zuley/vue-color-picker/compare/v2.1.0...v2.2.0) (2022-11-27)
+
+
+### Features
+
+* 🎸 添加 packages 组件源码目录 ([ea3190a](https://github.com/zuley/vue-color-picker/commit/ea3190a25d86ed9c5bd50c32e7ef8f18f7a233f4))
+
 # [2.1.0](https://github.com/zuley/vue-color-picker/compare/v2.0.1...v2.1.0) (2022-11-27)
 
 
