@@ -2,8 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import vColorPicker from './../packages/main'
 
-console.log('vColorPicker', vColorPicker)
+const app = createApp(App)
 
-import './assets/main.css'
+app.use(vColorPicker)
 
-createApp(App).mount('#app')
+app.mount('#app')
