@@ -7,6 +7,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps<{
   // 当前颜色
@@ -26,10 +27,12 @@ const openStatus = ref(false)
 const openPanel = () => {
   openStatus.value = !props.disabled
 }
+const colorPicker = ref<HTMLInputElement | null>(null)
 // 关闭面板
 const closePanel = () => {
   openStatus.value = false
 }
+onClickOutside(colorPicker, closePanel)
 
 // 鼠标经过的颜色块
 const hoveColor: string = ''
@@ -133,7 +136,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
 </script>
 
 <template>
-  <div class="m-colorPicker"  ref="colorPicker" v-clickoutside="closePanel" v-on:click="event => { event.stopPropagation() }">
+  <div class="m-colorPicker"  ref="colorPicker" v-on:click="event => { event.stopPropagation() }">
     <!-- 颜色显示小方块 -->
     <div class="colorBtn"
       v-bind:style="`background-color: ${showColor}`"

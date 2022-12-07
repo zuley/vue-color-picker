@@ -16,6 +16,7 @@
     "release": "release-it"
   },
   "dependencies": {
+    "@vueuse/core": "^9.6.0",
     "vue": "^3.2.45"
   },
   "devDependencies": {
