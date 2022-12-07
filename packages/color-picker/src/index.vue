@@ -9,16 +9,19 @@ export default {
 import { computed, ref } from 'vue';
 import { onClickOutside } from '@vueuse/core'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   // 当前颜色
   modelValue: string
   // 默认颜色
-  defaultColor: string
+  defaultColor?: string
   // 禁用状态
-  disabled: boolean
-}>()
+  disabled?: boolean
+}>(), {
+  defaultColor: '#000000'
+})
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  (e: 'change', value: string): void
 }>()
 
 // 面板状态
@@ -35,7 +38,10 @@ const closePanel = () => {
 onClickOutside(colorPicker, closePanel)
 
 // 鼠标经过的颜色块
-const hoveColor: string = ''
+const hoveColor = ref('')
+const handleOver = (color: string) => {
+  hoveColor.value = color
+}
 // 主题颜色
 const tColor = ['#000000', '#ffffff', '#eeece1', '#1e497b', '#4e81bb', '#e2534d', '#9aba60', '#8165a0', '#47acc5', '#f9974c']
 // 颜色面板
@@ -56,7 +62,7 @@ const bColor = ['#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b', '#00af57'
 const html5Color = props.modelValue
 // 计算属性：显示面板颜色
 const showPanelColor = computed(() => {
-  if (hoveColor) {
+  if (hoveColor.value) {
     return hoveColor
   } else {
     return showColor
@@ -86,6 +92,8 @@ const triggerHtml5Color = () => {
 // 更新组件的值
 const updataValue = (value: string) => {
   emits('update:modelValue', value)
+  emits('change', value)
+  openStatus.value = false
 }
 // 设置默认颜色
 const handleDefaultColor = () => {
@@ -136,21 +144,21 @@ const gradient = (startColor: string, endColor: string, step: number) => {
 </script>
 
 <template>
-  <div class="m-colorPicker"  ref="colorPicker" v-on:click="event => { event.stopPropagation() }">
+  <div class="m-colorPicker"  ref="colorPicker" @click="event => { event.stopPropagation() }">
     <!-- 颜色显示小方块 -->
     <div class="colorBtn"
-      v-bind:style="`background-color: ${showColor}`"
-      v-on:click="openPanel"
-      v-bind:class="{ disabled: disabled }"
+      :style="`background-color: ${showColor}`"
+      @click="openPanel"
+      :class="{ disabled: disabled }"
     ></div>
     <!-- 颜色色盘 -->
-    <div class="box" v-bind:class="{ open: openStatus }" >
+    <div class="box" :class="{ open: openStatus }" >
       <div class="hd">
-        <div class="colorView" v-bind:style="`background-color: ${showPanelColor}`"></div>
+        <div class="colorView" :style="{ 'background-color': showPanelColor.value }"></div>
         <div class="defaultColor"
-          v-on:click="handleDefaultColor"
-          v-on:mouseover="hoveColor = defaultColor"
-          v-on:mouseout="hoveColor = ''"
+          @click="handleDefaultColor"
+          @mouseover="handleOver(defaultColor)"
+          @mouseout="handleOver('')"
         >默认颜色</div>
       </div>
       <div class="bd">
@@ -159,10 +167,10 @@ const gradient = (startColor: string, endColor: string, step: number) => {
           <li
             v-for="(color, index) of tColor"
             :key="index"
-            v-bind:style="{ backgroundColor: color }"
-            v-on:mouseover="hoveColor = color"
-            v-on:mouseout="hoveColor = ''"
-            v-on:click="updataValue(color)"
+            :style="{ backgroundColor: color }"
+            @mouseover="handleOver(color)"
+            @mouseout="handleOver('')"
+            @click="updataValue(color)"
           ></li>
         </ul>
         <ul class="bColor">
@@ -171,10 +179,10 @@ const gradient = (startColor: string, endColor: string, step: number) => {
               <li
                 v-for="(color, cindex) of item"
                 :key="cindex"
-                v-bind:style="{ backgroundColor: color }"
-                v-on:mouseover="hoveColor = color"
-                v-on:mouseout="hoveColor = ''"
-                v-on:click="updataValue(color)"
+                :style="{ backgroundColor: color }"
+                @mouseover="handleOver(color)"
+                @mouseout="handleOver('')"
+                @click="updataValue(color)"
               ></li>
             </ul>
           </li>
@@ -184,18 +192,18 @@ const gradient = (startColor: string, endColor: string, step: number) => {
           <li
             v-for="(color, index) of bColor"
             :key="index"
-            v-bind:style="{ backgroundColor: color }"
-            v-on:mouseover="hoveColor = color"
-            v-on:mouseout="hoveColor = ''"
-            v-on:click="updataValue(color)"
+            :style="{ backgroundColor: color }"
+            @mouseover="handleOver(color)"
+            @mouseout="handleOver('')"
+            @click="updataValue(color)"
           ></li>
         </ul>
-        <h3 v-on:click="triggerHtml5Color">更多颜色...</h3>
+        <h3 @click="triggerHtml5Color">更多颜色...</h3>
         <!-- 用以激活HTML5颜色面板 -->
         <input type="color"
           ref="html5ColorEl"
           v-model="html5Color"
-          v-on:change="updataValue(html5Color)">
+          @change="updataValue(html5Color)">
       </div>
     </div>
   </div>
