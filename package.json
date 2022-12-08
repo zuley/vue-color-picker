@@ -1,14 +1,30 @@
 {
   "name": "vcolorpicker",
+  "version": "2.0.4",
+  "type": "module",
   "description": "基于 Vue3 的颜色选择器",
-  "main": "",
-  "keyword": "vcolorpicker colorpicker color-picker vue-color-picker",
+  "main": "./lib/vcolorpicker.mjs",
+  "module": "./lib/vcolorpicker.js",
+  "exports": {
+    ".": {
+      "import": "./lib/vcolorpicker.js",
+      "require": "./lib/vcolorpicker.mjs"
+    }
+  },
+  "keywords": [
+    "vcolorpicker",
+    "colorpicker",
+    "color-picker",
+    "vue-color-picker"
+  ],
+  "author": "zuley",
+  "license": "MIT",
   "homepage": "https://github.com/zuley/vue-color-picker",
-  "version": "2.2.0",
   "private": false,
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
+    "lib": "vite build --mode lib",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",

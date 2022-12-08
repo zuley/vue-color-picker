@@ -1,9 +1,16 @@
 # 忽略目录
 examples/
-packages/
 public/
+dist/
+.vscode/
+.devcontainer/
 
 # 忽略指定文件
-vue.config.js
-babel.config.js
+vite.config.ts
+tsconfig.config.json
+pnpm-lock.yaml
+index.html
+env.d.ts
+CHANGELOG.md
+.gitignore
 *.map
