@@ -17,7 +17,6 @@ export default defineConfig((env) => {
   // 当执行 pnpm lib 设置环境变量 --mode lib 时
   if (env.mode === 'lib') {
     defaultConfig.build = {
-      cssCodeSplit: false,
       lib: {
         entry: resolve(__dirname, 'packages/main.ts'),
         name: 'vcolorpicker',
