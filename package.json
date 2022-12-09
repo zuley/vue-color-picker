@@ -1,53 +1,72 @@
 {
   "name": "vcolorpicker",
-  "version": "1.1.0",
-  "description": "基于 Vue 的颜色选择器",
-  "main": "lib/vcolorpicker.umd.min.js",
-  "keyword": "vcolorpicker colorpicker color-picker",
+  "version": "2.0.4",
+  "type": "module",
+  "description": "基于 Vue3 的颜色选择器",
+  "main": "./lib/vcolorpicker.mjs",
+  "module": "./lib/vcolorpicker.js",
+  "exports": {
+    ".": {
+      "import": "./lib/vcolorpicker.js",
+      "require": "./lib/vcolorpicker.mjs"
+    }
+  },
+  "keywords": [
+    "vcolorpicker",
+    "colorpicker",
+    "color-picker",
+    "vue-color-picker"
+  ],
+  "author": "zuley",
+  "license": "MIT",
   "homepage": "https://github.com/zuley/vue-color-picker",
   "private": false,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name vcolorpicker --dest lib packages/index.js"
+    "dev": "vite",
+    "build": "run-p type-check build-only",
+    "lib": "vite build --mode lib",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit",
+    "commit": "git-cz",
+    "release": "release-it"
   },
   "dependencies": {
-    "highlight.js": "^9.12.0",
-    "vue": "^2.5.17"
+    "@vueuse/core": "^9.6.0",
+    "highlight.js": "^11.7.0",
+    "vue": "^3.2.45"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.1",
-    "@vue/cli-plugin-eslint": "^3.0.1",
-    "@vue/cli-service": "^3.0.1",
-    "node-sass": "^4.9.3",
-    "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.5.17"
+    "@release-it/conventional-changelog": "^5.1.1",
+    "@types/node": "^18.11.9",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "@vue/tsconfig": "^0.1.3",
+    "git-cz": "^4.9.0",
+    "npm-run-all": "^4.1.5",
+    "release-it": "^15.5.0",
+    "sass": "^1.56.1",
+    "typescript": "~4.7.4",
+    "vite": "^3.2.4",
+    "vue-tsc": "^1.0.9"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
+  "release-it": {
+    "github": {
+      "release": false
     },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "rules": {
-      "no-console": "off"
+    "git": {
+      "commitMessage": "release: v${version}"
     },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
+    "npm": {
+      "publish": false
+    },
+    "hooks": {
+      "after:bump": "echo 更新版本成功"
+    },
     "plugins": {
-      "autoprefixer": {}
+      "@release-it/conventional-changelog": {
+        "preset": "angular",
+        "infile": "CHANGELOG.md"
+      }
     }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  }
 }

@@ -1,16 +1,41 @@
 # vColorPicker
 
 > 基于Vue的颜色选择器插件
-
 [DEMO 演示](http://vue-color-picker.rxshc.com/)
 
 ## 安装
 
 ``` bash
-$ npm install vcolorpicker -S
+# vue2
+npm install vcolorpicker@1.1.0 -S
+# vue3
+npm install vcolorpicker -S
 ```
 ## 使用
+### vue3 使用
+在`main.ts`文件中引入并注册
+```ts
+import vColorPicker from 'vcolorpicker'
+const app = createApp(App)
+app.use(vColorPicker)
+```
+在页面中使用
+```vue
+<script lang="ts" setup>
+import { ref } from 'vue'
 
+const color = ref('#ff0000')
+const headleChangeColor = (color: string) => {
+  console.log(`颜色值改变事件：${color}`)
+}
+</script>
+<template>
+  <colorPicker v-model="color" @change="headleChangeColor"></colorPicker>
+</template>
+```
+
+
+### vue2 使用
 在 `main.js` 文件中引入插件并注册
 
 ``` bash
@@ -50,5 +75,5 @@ Vue.use(vcolorpicker)
 `change`颜色值改变的时候触发
 
 ``` js
-<colorPicker v-model="color" v-on:change="headleChangeColor" />
+<colorPicker v-model="color" @change="headleChangeColor" />
 ```

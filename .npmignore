@@ -1,5 +1,16 @@
-README.md
-test-project
-definition-manifest.json
-.vscode
-.npmignore
+# 忽略目录
+examples/
+public/
+dist/
+.vscode/
+.devcontainer/
+
+# 忽略指定文件
+vite.config.ts
+tsconfig.config.json
+pnpm-lock.yaml
+index.html
+env.d.ts
+CHANGELOG.md
+.gitignore
+*.map
