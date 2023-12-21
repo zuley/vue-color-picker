@@ -62,7 +62,7 @@ const bColor = ['#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b', '#00af57'
 const html5Color = computed({
   get: () => props.modelValue,
   set: (value) => {
-    updataValue(value)
+    updateValue(value)
   }
 })
 // 计算属性：显示面板颜色
@@ -95,13 +95,13 @@ const triggerHtml5Color = () => {
   html5ColorEl.value?.click()
 }
 // 更新组件的值
-const updataValue = (value: string) => {
+const updateValue = (value: string) => {
   emits('update:modelValue', value)
   emits('change', value)
 }
 // 设置默认颜色
 const handleDefaultColor = () => {
-  updataValue(props.defaultColor)
+  updateValue(props.defaultColor)
 }
 
 /**
@@ -174,7 +174,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
             :style="{ backgroundColor: color }"
             @mouseover="handleOver(color)"
             @mouseout="handleOver('')"
-            @click="updataValue(color)"
+            @click="updateValue(color)"
           ></li>
         </ul>
         <ul class="bColor">
@@ -186,7 +186,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
                 :style="{ backgroundColor: color }"
                 @mouseover="handleOver(color)"
                 @mouseout="handleOver('')"
-                @click="updataValue(color)"
+                @click="updateValue(color)"
               ></li>
             </ul>
           </li>
@@ -199,7 +199,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
             :style="{ backgroundColor: color }"
             @mouseover="handleOver(color)"
             @mouseout="handleOver('')"
-            @click="updataValue(color)"
+            @click="updateValue(color)"
           ></li>
         </ul>
         <h3 @click="triggerHtml5Color">更多颜色...</h3>
