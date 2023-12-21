@@ -59,7 +59,12 @@ const colorConfig = [
   ]
 // 标准颜色
 const bColor = ['#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b', '#00af57', '#00afee', '#0071be', '#00215f', '#72349d']
-const html5Color = props.modelValue
+const html5Color = computed({
+  get: () => props.modelValue,
+  set: (value) => {
+    updateValue(value)
+  }
+})
 // 计算属性：显示面板颜色
 const showPanelColor = computed(() => {
   if (hoveColor.value) {
@@ -90,14 +95,13 @@ const triggerHtml5Color = () => {
   html5ColorEl.value?.click()
 }
 // 更新组件的值
-const updataValue = (value: string) => {
+const updateValue = (value: string) => {
   emits('update:modelValue', value)
   emits('change', value)
-  openStatus.value = false
 }
 // 设置默认颜色
 const handleDefaultColor = () => {
-  updataValue(props.defaultColor)
+  updateValue(props.defaultColor)
 }
 
 /**
@@ -170,7 +174,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
             :style="{ backgroundColor: color }"
             @mouseover="handleOver(color)"
             @mouseout="handleOver('')"
-            @click="updataValue(color)"
+            @click="updateValue(color)"
           ></li>
         </ul>
         <ul class="bColor">
@@ -182,7 +186,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
                 :style="{ backgroundColor: color }"
                 @mouseover="handleOver(color)"
                 @mouseout="handleOver('')"
-                @click="updataValue(color)"
+                @click="updateValue(color)"
               ></li>
             </ul>
           </li>
@@ -195,15 +199,14 @@ const gradient = (startColor: string, endColor: string, step: number) => {
             :style="{ backgroundColor: color }"
             @mouseover="handleOver(color)"
             @mouseout="handleOver('')"
-            @click="updataValue(color)"
+            @click="updateValue(color)"
           ></li>
         </ul>
         <h3 @click="triggerHtml5Color">更多颜色...</h3>
         <!-- 用以激活HTML5颜色面板 -->
         <input type="color"
           ref="html5ColorEl"
-          v-model="html5Color"
-          @change="updataValue(html5Color)">
+          v-model="html5Color">
       </div>
     </div>
   </div>
