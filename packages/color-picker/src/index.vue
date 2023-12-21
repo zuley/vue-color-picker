@@ -59,7 +59,12 @@ const colorConfig = [
   ]
 // 标准颜色
 const bColor = ['#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b', '#00af57', '#00afee', '#0071be', '#00215f', '#72349d']
-const html5Color = props.modelValue
+const html5Color = computed({
+  get: () => props.modelValue,
+  set: (value) => {
+    updataValue(value)
+  }
+})
 // 计算属性：显示面板颜色
 const showPanelColor = computed(() => {
   if (hoveColor.value) {
@@ -93,7 +98,6 @@ const triggerHtml5Color = () => {
 const updataValue = (value: string) => {
   emits('update:modelValue', value)
   emits('change', value)
-  openStatus.value = false
 }
 // 设置默认颜色
 const handleDefaultColor = () => {
@@ -202,8 +206,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
         <!-- 用以激活HTML5颜色面板 -->
         <input type="color"
           ref="html5ColorEl"
-          v-model="html5Color"
-          @change="updataValue(html5Color)">
+          v-model="html5Color">
       </div>
     </div>
   </div>
