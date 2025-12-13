@@ -209,7 +209,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .m-colorPicker{
   position: relative; text-align: left; font-size: 14px; display: inline-block;
   outline: none;

@@ -7,7 +7,6 @@ dist/
 
 # 忽略指定文件
 vite.config.ts
-tsconfig.config.json
 pnpm-lock.yaml
 index.html
 env.d.ts

@@ -1,0 +1,16 @@
+{
+  "name": "vColorPicker",
+  "short_name": "vColorPicker",
+  "description": "基于 Vue3 的颜色选择器",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff1e02",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

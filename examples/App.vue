@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <div class="page-header">
+    <header class="page-header">
       <h1>vColorPicker</h1>
       <h2>基于 Vue 的颜色选择器插件</h2>
       <a href="https://github.com/zuley/vue-color-picker" class="btn" target="_blank">View on GitHub</a>
-    </div>
-    <div class="page-content" v-hljs>
-      <h1>vColorPicker</h1>
+    </header>
+    <main class="page-content" v-hljs>
+      <h2>使用文档</h2>
       <p>本插件仿照<code>Angular</code>的<code><a href="http://zhangbobell.github.io/color-picker/" target="_blank">color-picker</a></code>插件制作</p>
       <h2>Demo</h2>
       <colorPicker v-model="color" @change="headleChangeColor"></colorPicker>
@@ -47,8 +47,18 @@ Vue.use(vcolorpicker)
       <p><code>change</code>颜色值改变的时候触发</p>
 <pre>&lt;colorPicker v-model=&quot;color&quot; v-on:change=&quot;headleChangeColor&quot;&gt;&lt;/colorPicker&gt;
 </pre>
-    </div>
-    <div class="page-footer">Vue-color-picker 插件由<a href="http://www.rxshc.com/" target="_blank">猪不乐意</a>编写</div>
+    </main>
+    <section class="page-sponsor" aria-label="赞助">
+      <div class="page-sponsor__inner">
+        <h2>赞助</h2>
+        <p>感谢赞助商支持：</p>
+        <div class="page-sponsor__links">
+          <a href="https://aipromptcard.app" target="_blank" rel="noopener noreferrer">AI Prompt Card：生成可分享的 AI Prompt 卡片</a>
+          <a href="https://convertimagetowebp.app" target="_blank" rel="noopener noreferrer">Convert Image to WebP：离线图片转 WebP</a>
+        </div>
+      </div>
+    </section>
+    <footer class="page-footer">Vue-color-picker 插件由<a href="http://www.rxshc.com/" target="_blank">猪不乐意</a>编写</footer>
   </div>
 </template>
 

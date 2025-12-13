@@ -27,3 +27,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+# Allow tracking sitemap (some global gitignores exclude *.xml)
+!public/sitemap.xml
