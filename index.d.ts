@@ -1,5 +1,5 @@
-import type { App } from 'vue';
+import type { PluginInstallFunction } from 'vue';
 declare const _default: {
-  install: (app: App<any>) => App<any>;
+  install: PluginInstallFunction
 };
 export default _default;
