@@ -68,6 +68,47 @@ h1,h2,h3,h4,h5,h6{ font-weight: normal; margin: 0; padding: 0px; }
   }
 }
 
+.page-sponsor{
+  padding: 24px 0;
+  background: #fafafa;
+  border-top: 1px solid #eee;
+  .page-sponsor__inner{
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 0 30px;
+    text-align: center;
+  }
+  h2{
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: #159957;
+  }
+  p{
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #777;
+  }
+  .page-sponsor__links{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  a{
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #606c71;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 999px;
+    transition: all .2s ease;
+  }
+  a:hover{
+    color: #159957;
+    border-color: #159957;
+  }
+}
+
 .page-footer{
   text-align: center;
   line-height: 60px;

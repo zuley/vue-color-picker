@@ -48,6 +48,16 @@ Vue.use(vcolorpicker)
 <pre>&lt;colorPicker v-model=&quot;color&quot; v-on:change=&quot;headleChangeColor&quot;&gt;&lt;/colorPicker&gt;
 </pre>
     </main>
+    <section class="page-sponsor" aria-label="赞助">
+      <div class="page-sponsor__inner">
+        <h2>赞助</h2>
+        <p>感谢赞助商支持：</p>
+        <div class="page-sponsor__links">
+          <a href="https://aipromptcard.app" target="_blank" rel="noopener noreferrer">AI Prompt Card：生成可分享的 AI Prompt 卡片</a>
+          <a href="https://convertimagetowebp.app" target="_blank" rel="noopener noreferrer">Convert Image to WebP：离线图片转 WebP</a>
+        </div>
+      </div>
+    </section>
     <footer class="page-footer">Vue-color-picker 插件由<a href="http://www.rxshc.com/" target="_blank">猪不乐意</a>编写</footer>
   </div>
 </template>
