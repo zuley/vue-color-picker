@@ -77,3 +77,9 @@ Vue.use(vcolorpicker)
 ``` js
 <colorPicker v-model="color" @change="headleChangeColor" />
 ```
+
+## 赞助
+感谢赞助商支持：
+
+- <a href="https://aipromptcard.app" target="_blank" rel="noopener">AI Prompt Card：生成可分享的 AI Prompt 卡片</a>
+- <a href="https://convertimagetowebp.app" target="_blank" rel="noopener">Convert Image to WebP：离线图片转 WebP</a>
