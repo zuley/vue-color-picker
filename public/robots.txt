@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: http://vue-color-picker.rxshc.com/sitemap.xml

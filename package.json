@@ -16,11 +16,20 @@
     "vcolorpicker",
     "colorpicker",
     "color-picker",
-    "vue-color-picker"
+    "vue-color-picker",
+    "vue",
+    "vue3"
   ],
   "author": "zuley",
   "license": "MIT",
-  "homepage": "https://github.com/zuley/vue-color-picker",
+  "homepage": "http://vue-color-picker.rxshc.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zuley/vue-color-picker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zuley/vue-color-picker/issues"
+  },
   "private": false,
   "scripts": {
     "dev": "vite",
