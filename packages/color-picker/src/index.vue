@@ -78,8 +78,8 @@ const showColor = computed(() => {
 })
 // 计算属性：颜色面板
 const colorPanel = computed(() => {
-  let colorArr = []
-  for (let color of colorConfig) {
+  const colorArr = []
+  for (const color of colorConfig) {
     colorArr.push(gradient(color[1], color[0], 5))
   }
   return colorArr
@@ -106,7 +106,7 @@ const handleDefaultColor = () => {
 // 格式化 hex 颜色值
 const parseColor = (hexStr: string) => {
   if (hexStr.length === 4) {
-    return hexStr = '#' + hexStr[1] + hexStr[1] + hexStr[2] + hexStr[2] + hexStr[3] + hexStr[3]
+    return '#' + hexStr[1] + hexStr[1] + hexStr[2] + hexStr[2] + hexStr[3] + hexStr[3]
   } else {
     return hexStr
   }
@@ -119,7 +119,7 @@ const rgbToHex = (r: number, g: number, b: number) => {
 // HEX 转 RGB 颜色
 const hexToRgb = (hex: string) => {
   hex = parseColor(hex)
-  let rgb = []
+  const rgb = []
   for (let i = 1; i < 7; i += 2) {
     rgb.push(parseInt('0x' + hex.slice(i, i + 2)))
   }
@@ -128,13 +128,13 @@ const hexToRgb = (hex: string) => {
 // 计算渐变过渡颜色
 const gradient = (startColor: string, endColor: string, step: number) => {
   // 讲 hex 转换为 rgb
-  let sColor = hexToRgb(startColor)
-  let eColor = hexToRgb(endColor)
+  const sColor = hexToRgb(startColor)
+  const eColor = hexToRgb(endColor)
   // 计算R\G\B每一步的差值
-  let rStep = (eColor[0] - sColor[0]) / step
-  let gStep = (eColor[1] - sColor[1]) / step
-  let bStep = (eColor[2] - sColor[2]) / step
-  let gradientColorArr = []
+  const rStep = (eColor[0] - sColor[0]) / step
+  const gStep = (eColor[1] - sColor[1]) / step
+  const bStep = (eColor[2] - sColor[2]) / step
+  const gradientColorArr = []
   // 计算每一步的hex值
   for (let i = 0; i < step; i++) {
     gradientColorArr.push(rgbToHex(rStep * i + sColor[0], gStep * i + sColor[1], bStep * i + sColor[2]))
