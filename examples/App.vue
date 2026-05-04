@@ -61,7 +61,7 @@ Vue.use(vcolorpicker)
         </div>
       </div>
     </section>
-    <footer class="page-footer">Vue-color-picker 插件由<a href="http://www.rxshc.com/" target="_blank">猪不乐意</a>编写</footer>
+    <footer class="page-footer">Vue-color-picker 插件由<a href="https://www.rxshc.com/" target="_blank">猪不乐意</a>编写</footer>
   </div>
 </template>
 
