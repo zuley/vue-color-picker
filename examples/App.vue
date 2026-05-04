@@ -66,7 +66,6 @@ Vue.use(vcolorpicker)
 import { ref } from 'vue';
 
 const color = ref('#ff0000')
-const color2 = ref('')
 
 const headleChangeColor = (color: string) => {
   console.log(`颜色值改变事件：${color}`)
@@ -74,5 +73,5 @@ const headleChangeColor = (color: string) => {
 </script>
 
 <style lang="scss">
-@import "assets/main";
+@use "assets/main";
 </style>

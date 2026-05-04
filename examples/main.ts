@@ -9,7 +9,7 @@ const app = createApp(App)
 
 app.use(vColorPicker)
 app.directive('hljs', el => {
-  let blocks = el.querySelectorAll('pre')
+  const blocks = el.querySelectorAll('pre')
   Array.prototype.forEach.call(blocks, hljs.highlightBlock)
 })
 
