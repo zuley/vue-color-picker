@@ -1,13 +1,13 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": ["env.d.ts", "examples/**/*", "examples/**/*.vue", "packages/**/*", "packages/**/*.vue"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@/*": ["./examples/*"]
-    }
+    },
+    "types": ["@types/web-bluetooth"]
   },
-
   "references": [
     {
       "path": "./tsconfig.config.json"
