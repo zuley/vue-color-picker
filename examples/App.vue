@@ -55,6 +55,9 @@ Vue.use(vcolorpicker)
         <div class="page-sponsor__links">
           <a href="https://aipromptcard.app" target="_blank" rel="noopener noreferrer">AI Prompt Card：生成可分享的 AI Prompt 卡片</a>
           <a href="https://convertimagetowebp.app" target="_blank" rel="noopener noreferrer">Convert Image to WebP：离线图片转 WebP</a>
+          <a href="https://openagentskills.dev" target="_blank" rel="noopener noreferrer">Open Agent Skills</a>
+          <a href="https://toolsonline.run" target="_blank" rel="noopener noreferrer">Tools Online</a>
+          <a href="https://ui-ux-pro-max-skill.com" target="_blank" rel="noopener noreferrer">UI UX Pro Max Skill</a>
         </div>
       </div>
     </section>
