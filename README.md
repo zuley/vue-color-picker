@@ -34,6 +34,24 @@ const headleChangeColor = (color: string) => {
 </template>
 ```
 
+多语言使用示例
+
+```vue
+<script lang="ts" setup>
+import { ref } from 'vue'
+
+const color = ref('#3b82f6')
+</script>
+
+<template>
+  <colorPicker
+    v-model="color"
+    locale="en-US"
+    :messages="{ moreColors: 'Custom Label...' }"
+  />
+</template>
+```
+
 
 ### vue2 使用
 在 `main.js` 文件中引入插件并注册
@@ -70,6 +88,8 @@ Vue.use(vcolorpicker)
 你可以通过在所在的元素上设置以下属性来配置`color-picker`
 1. `defaultColor`：默认颜色，如`defaultColor="#ff0000"`
 2. `disabled`：禁用状态，如`disabled=true`
+3. `locale`：内置语言，可选值为`zh-CN`和`en-US`，不传时自动跟随当前页面语言
+4. `messages`：自定义文案对象，可覆盖`defaultColor`、`themeColors`、`standardColors`、`moreColors`
 
 ## 事件
 `change`颜色值改变的时候触发

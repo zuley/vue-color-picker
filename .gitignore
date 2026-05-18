@@ -12,6 +12,7 @@ node_modules
 dist
 lib
 dist-ssr
+docs/.vitepress/cache
 coverage
 *.local
 

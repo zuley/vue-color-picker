@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     plugins: [vue()],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./examples', import.meta.url))
+        '@': fileURLToPath(new URL('./docs', import.meta.url))
       }
     }
   }

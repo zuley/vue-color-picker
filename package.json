@@ -23,7 +23,7 @@
   ],
   "author": "zuley",
   "license": "MIT",
-  "homepage": "http://vue-color-picker.rxshc.com/",
+  "homepage": "https://vue-color-picker.rxshc.com/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zuley/vue-color-picker.git"
@@ -33,7 +33,7 @@
   },
   "private": false,
   "scripts": {
-    "dev": "vite",
+    "dev": "vitepress dev docs",
     "build": "run-p type-check build-only",
     "lib": "vite build --mode lib",
     "preview": "vite preview",
@@ -42,7 +42,10 @@
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
     "commit": "git-cz",
-    "release": "release-it"
+    "release": "release-it",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@vueuse/core": "^14.3.0",
@@ -67,6 +70,7 @@
     "sass": "^1.99.0",
     "typescript": "~5.8.3",
     "vite": "^8.0.10",
+    "vitepress": "^1.6.4",
     "vue-tsc": "^3.2.7"
   },
   "release-it": {

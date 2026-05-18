@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="vColorPicker social preview">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#c026d3" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="930" cy="180" r="120" fill="#ffffff" opacity="0.08" />
+  <circle cx="1030" cy="470" r="180" fill="#ffffff" opacity="0.08" />
+  <rect x="92" y="120" width="128" height="128" rx="32" fill="#ffffff" opacity="0.18" />
+  <path
+    d="M131 155a10 10 0 0 1 14.14 0L179 188.86 197.86 170a10 10 0 0 1 14.14 14.14L186.28 209.9a10 10 0 0 1-14.14 0L131 168.72a10 10 0 0 1 0-14.14Z"
+    fill="#ffffff"
+  />
+  <circle cx="216" cy="215" r="18" fill="#fde047" />
+  <text x="92" y="340" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="700">
+    vColorPicker
+  </text>
+  <text x="92" y="418" fill="#dbeafe" font-family="Inter, Arial, sans-serif" font-size="34">
+    A color picker component for Vue 3 with multilingual docs.
+  </text>
+  <text x="92" y="482" fill="#bfdbfe" font-family="Inter, Arial, sans-serif" font-size="28">
+    vue-color-picker.rxshc.com
+  </text>
+</svg>

@@ -6,8 +6,55 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, shallowRef, useTemplateRef } from 'vue'
 import { onClickOutside } from '@vueuse/core'
+
+type ColorPickerLocale = 'zh-CN' | 'en-US'
+
+interface ColorPickerMessages {
+  defaultColor: string
+  themeColors: string
+  standardColors: string
+  moreColors: string
+}
+
+const localeMessagesMap: Record<ColorPickerLocale, ColorPickerMessages> = {
+  'zh-CN': {
+    defaultColor: '默认颜色',
+    themeColors: '主题颜色',
+    standardColors: '标准颜色',
+    moreColors: '更多颜色...'
+  },
+  'en-US': {
+    defaultColor: 'Default',
+    themeColors: 'Theme Colors',
+    standardColors: 'Standard Colors',
+    moreColors: 'More Colors...'
+  }
+}
+
+const normalizeLocale = (locale?: string): ColorPickerLocale => {
+  if (!locale) {
+    return 'zh-CN'
+  }
+
+  return locale.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US'
+}
+
+const detectLocale = (): ColorPickerLocale => {
+  if (typeof document !== 'undefined') {
+    const documentLang = document.documentElement.lang
+    if (documentLang) {
+      return normalizeLocale(documentLang)
+    }
+  }
+
+  if (typeof navigator !== 'undefined') {
+    return normalizeLocale(navigator.language)
+  }
+
+  return 'zh-CN'
+}
 
 const props = withDefaults(defineProps<{
   // 当前颜色
@@ -16,21 +63,40 @@ const props = withDefaults(defineProps<{
   defaultColor?: string
   // 禁用状态
   disabled?: boolean
+  // 内置语言
+  locale?: ColorPickerLocale
+  // 自定义文案
+  messages?: Partial<ColorPickerMessages>
 }>(), {
-  defaultColor: '#000000'
+  defaultColor: '#000000',
+  messages: () => ({})
 })
+
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'change', value: string): void
 }>()
 
 // 面板状态
-const openStatus = ref(false)
+const openStatus = shallowRef(false)
+const panelVerticalPlacement = shallowRef<'bottom' | 'top'>('bottom')
+const panelHorizontalPlacement = shallowRef<'left' | 'right'>('left')
 // 打开面板
 const openPanel = () => {
-  openStatus.value = !props.disabled
+  if (props.disabled) {
+    return
+  }
+
+  openStatus.value = !openStatus.value
+
+  if (openStatus.value) {
+    void nextTick(() => {
+      updatePanelPlacement()
+    })
+  }
 }
-const colorPicker = ref<HTMLInputElement | null>(null)
+const colorPicker = useTemplateRef<HTMLDivElement>('colorPicker')
+const colorPanelEl = useTemplateRef<HTMLDivElement>('colorPanelEl')
 // 关闭面板
 const closePanel = () => {
   openStatus.value = false
@@ -38,9 +104,9 @@ const closePanel = () => {
 onClickOutside(colorPicker, closePanel)
 
 // 鼠标经过的颜色块
-const hoveColor = ref('')
-const handleOver = (color: string) => {
-  hoveColor.value = color
+const hoverColor = shallowRef('')
+const handleHover = (color: string) => {
+  hoverColor.value = color
 }
 // 主题颜色
 const tColor = ['#000000', '#ffffff', '#eeece1', '#1e497b', '#4e81bb', '#e2534d', '#9aba60', '#8165a0', '#47acc5', '#f9974c']
@@ -59,45 +125,103 @@ const colorConfig = [
   ]
 // 标准颜色
 const bColor = ['#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b', '#00af57', '#00afee', '#0071be', '#00215f', '#72349d']
-const html5Color = props.modelValue
+
+const detectedLocale = shallowRef<ColorPickerLocale>(props.locale ? normalizeLocale(props.locale) : 'zh-CN')
+let documentLangObserver: MutationObserver | null = null
+
+onMounted(() => {
+  detectedLocale.value = detectLocale()
+
+  if (typeof document === 'undefined') {
+    return
+  }
+
+  documentLangObserver = new MutationObserver(() => {
+    detectedLocale.value = detectLocale()
+  })
+
+  documentLangObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['lang']
+  })
+
+  window.addEventListener('resize', updatePanelPlacement)
+  window.addEventListener('scroll', updatePanelPlacement, true)
+})
+
+onBeforeUnmount(() => {
+  documentLangObserver?.disconnect()
+  documentLangObserver = null
+  window.removeEventListener('resize', updatePanelPlacement)
+  window.removeEventListener('scroll', updatePanelPlacement, true)
+})
+
+const resolvedLocale = computed<ColorPickerLocale>(() => {
+  return props.locale ? normalizeLocale(props.locale) : detectedLocale.value
+})
+
+const resolvedMessages = computed<ColorPickerMessages>(() => ({
+  ...localeMessagesMap[resolvedLocale.value],
+  ...props.messages
+}))
+
 // 计算属性：显示面板颜色
 const showPanelColor = computed(() => {
-  if (hoveColor.value) {
-    return hoveColor
-  } else {
-    return showColor
-  }
+  return hoverColor.value || showColor.value
 })
 // 计算属性：显示颜色
 const showColor = computed(() => {
-  if (props.modelValue) {
-    return props.modelValue
-  } else {
-    return props.defaultColor
-  }
+  return props.modelValue || props.defaultColor
 })
 // 计算属性：颜色面板
 const colorPanel = computed(() => {
-  const colorArr = []
+  const colorArr: string[][] = []
   for (const color of colorConfig) {
     colorArr.push(gradient(color[1], color[0], 5))
   }
   return colorArr
 })
 
-const html5ColorEl = ref<HTMLInputElement | null>(null)
+const html5ColorEl = useTemplateRef<HTMLInputElement>('html5ColorEl')
+const updatePanelPlacement = () => {
+  if (!colorPicker.value || !colorPanelEl.value || !openStatus.value) {
+    return
+  }
+
+  const triggerRect = colorPicker.value.getBoundingClientRect()
+  const panelRect = colorPanelEl.value.getBoundingClientRect()
+  const viewportHeight = window.innerHeight
+  const viewportWidth = window.innerWidth
+
+  const spaceBelow = viewportHeight - triggerRect.bottom
+  const spaceAbove = triggerRect.top
+  const spaceRight = viewportWidth - triggerRect.left
+  const leftAvailableSpace = triggerRect.right
+
+  panelVerticalPlacement.value =
+    panelRect.height > spaceBelow && spaceAbove > spaceBelow ? 'top' : 'bottom'
+
+  panelHorizontalPlacement.value =
+    panelRect.width > spaceRight && leftAvailableSpace > spaceRight ? 'right' : 'left'
+}
+
 const triggerHtml5Color = () => {
   html5ColorEl.value?.click()
 }
 // 更新组件的值
-const updataValue = (value: string) => {
+const updateValue = (value: string) => {
   emits('update:modelValue', value)
   emits('change', value)
   openStatus.value = false
 }
 // 设置默认颜色
 const handleDefaultColor = () => {
-  updataValue(props.defaultColor)
+  updateValue(props.defaultColor)
+}
+
+const handleHtml5ColorChange = (event: Event) => {
+  const value = (event.target as HTMLInputElement).value
+  updateValue(value)
 }
 
 /**
@@ -144,7 +268,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
 </script>
 
 <template>
-  <div class="m-colorPicker"  ref="colorPicker" @click="event => { event.stopPropagation() }">
+  <div class="m-colorPicker" :class="{ open: openStatus }" ref="colorPicker" @click="event => { event.stopPropagation() }">
     <!-- 颜色显示小方块 -->
     <div class="colorBtn"
       :style="`background-color: ${showColor}`"
@@ -152,25 +276,33 @@ const gradient = (startColor: string, endColor: string, step: number) => {
       :class="{ disabled: disabled }"
     ></div>
     <!-- 颜色色盘 -->
-    <div class="box" :class="{ open: openStatus }" >
+    <div
+      ref="colorPanelEl"
+      class="box"
+      :class="{
+        open: openStatus,
+        'placement-top': panelVerticalPlacement === 'top',
+        'placement-right': panelHorizontalPlacement === 'right'
+      }"
+    >
       <div class="hd">
-        <div class="colorView" :style="{ 'background-color': showPanelColor.value }"></div>
+        <div class="colorView" :style="{ backgroundColor: showPanelColor }"></div>
         <div class="defaultColor"
           @click="handleDefaultColor"
-          @mouseover="handleOver(defaultColor)"
-          @mouseout="handleOver('')"
-        >默认颜色</div>
+          @mouseover="handleHover(defaultColor)"
+          @mouseout="handleHover('')"
+        >{{ resolvedMessages.defaultColor }}</div>
       </div>
       <div class="bd">
-        <h3>主题颜色</h3>
+        <h3>{{ resolvedMessages.themeColors }}</h3>
         <ul class="tColor">
           <li
             v-for="(color, index) of tColor"
             :key="index"
             :style="{ backgroundColor: color }"
-            @mouseover="handleOver(color)"
-            @mouseout="handleOver('')"
-            @click="updataValue(color)"
+            @mouseover="handleHover(color)"
+            @mouseout="handleHover('')"
+            @click="updateValue(color)"
           ></li>
         </ul>
         <ul class="bColor">
@@ -180,30 +312,30 @@ const gradient = (startColor: string, endColor: string, step: number) => {
                 v-for="(color, cindex) of item"
                 :key="cindex"
                 :style="{ backgroundColor: color }"
-                @mouseover="handleOver(color)"
-                @mouseout="handleOver('')"
-                @click="updataValue(color)"
+                @mouseover="handleHover(color)"
+                @mouseout="handleHover('')"
+                @click="updateValue(color)"
               ></li>
             </ul>
           </li>
         </ul>
-        <h3>标准颜色</h3>
+        <h3>{{ resolvedMessages.standardColors }}</h3>
         <ul class="tColor">
           <li
             v-for="(color, index) of bColor"
             :key="index"
             :style="{ backgroundColor: color }"
-            @mouseover="handleOver(color)"
-            @mouseout="handleOver('')"
-            @click="updataValue(color)"
+            @mouseover="handleHover(color)"
+            @mouseout="handleHover('')"
+            @click="updateValue(color)"
           ></li>
         </ul>
-        <h3 @click="triggerHtml5Color">更多颜色...</h3>
+        <h3 @click="triggerHtml5Color">{{ resolvedMessages.moreColors }}</h3>
         <!-- 用以激活HTML5颜色面板 -->
         <input type="color"
           ref="html5ColorEl"
-          v-model="html5Color"
-          @change="updataValue(html5Color)">
+          :value="showColor"
+          @input="handleHtml5ColorChange">
       </div>
     </div>
   </div>
@@ -216,9 +348,12 @@ const gradient = (startColor: string, endColor: string, step: number) => {
   ul,li,ol{ list-style: none; margin: 0; padding: 0; }
   .colorBtn{ width: 15px; height: 15px; }
   .colorBtn.disabled{ cursor: no-drop; }
+  &.open{ z-index: 10000; }
   .box{
-    position: absolute; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 2px; padding: 10px; padding-bottom: 5px; box-shadow: 0 0 5px rgba(0,0,0,.15); opacity: 0; transition: all .3s ease;
+    position: absolute; top: calc(100% + 2px); left: 0; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 0; padding: 10px; padding-bottom: 5px; box-shadow: 0 8px 24px rgba(0,0,0,.18); opacity: 0; transition: all .3s ease;
     box-sizing: content-box;
+    z-index: 1;
+    pointer-events: none;
     h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: #333; }
     input {
       visibility: hidden;
@@ -227,7 +362,9 @@ const gradient = (startColor: string, endColor: string, step: number) => {
       bottom: 0;
     }
   }
-  .box.open{ visibility: visible; opacity: 1;z-index: 1; }
+  .box.placement-top{ top: auto; bottom: calc(100% + 2px); }
+  .box.placement-right{ left: auto; right: 0; }
+  .box.open{ visibility: visible; opacity: 1; pointer-events: auto; }
   .hd{
     overflow: hidden; line-height: 29px;
     .colorView{ width: 100px; height: 30px; float: left; transition: background-color .3s ease; }
