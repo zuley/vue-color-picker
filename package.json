@@ -1,17 +1,26 @@
 {
   "name": "vcolorpicker",
-  "version": "2.0.12",
+  "version": "2.1.0",
   "type": "module",
   "description": "基于 Vue3 的颜色选择器",
-  "main": "./lib/vcolorpicker.mjs",
+  "main": "./lib/vcolorpicker.umd.cjs",
   "module": "./lib/vcolorpicker.js",
   "types": "./index.d.ts",
+  "files": [
+    "lib/vcolorpicker.css",
+    "lib/vcolorpicker.js",
+    "lib/vcolorpicker.umd.cjs",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "import": "./lib/vcolorpicker.js",
-      "require": "./lib/vcolorpicker.mjs"
+      "require": "./lib/vcolorpicker.umd.cjs",
+      "types": "./index.d.ts"
     },
-    "./lib/*": "./lib/*"
+    "./style.css": "./lib/vcolorpicker.css"
   },
   "keywords": [
     "vcolorpicker",
