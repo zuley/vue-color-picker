@@ -11,7 +11,7 @@ export default [
 
   {
     name: 'app/files-to-ignore',
-    ignores: ['**/dist/**', '**/lib/**', '**/dist-ssr/**', '**/coverage/**']
+    ignores: ['**/dist/**', '**/lib/**', '**/dist-ssr/**', '**/coverage/**', '**/docs/.vitepress/cache/**']
   },
 
   js.configs.recommended,
