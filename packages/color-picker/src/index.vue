@@ -1,21 +1,28 @@
 <script lang="ts">
-// 声明无法在 <script setup> 中声明的选项
+// 声明无法在 <script setup> 中声明的选项；本块为模块作用域，常量只初始化一次
+import type {
+  ColorPickerExposed,
+  ColorPickerLocale,
+  ColorPickerMessages,
+  ColorPickerPlacement
+} from './types'
+
 export default {
   name: "colorPicker"
 }
-</script>
 
-<script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, shallowRef, useTemplateRef } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+type ResolvedPlacement = {
+  vertical: 'top' | 'bottom' | 'auto'
+  horizontal: 'left' | 'right' | 'auto'
+}
 
-type ColorPickerLocale = 'zh-CN' | 'en-US' | 'ja-JP'
-
-interface ColorPickerMessages {
-  defaultColor: string
-  themeColors: string
-  standardColors: string
-  moreColors: string
+const parsePlacement = (p: ColorPickerPlacement): ResolvedPlacement => {
+  if (p === 'auto') return { vertical: 'auto', horizontal: 'auto' }
+  const [v, h] = p.split('-') as ['top' | 'bottom', 'start' | 'end' | undefined]
+  return {
+    vertical: v,
+    horizontal: h ? (h === 'start' ? 'left' : 'right') : 'auto'
+  }
 }
 
 const localeMessagesMap: Record<ColorPickerLocale, ColorPickerMessages> = {
@@ -23,47 +30,146 @@ const localeMessagesMap: Record<ColorPickerLocale, ColorPickerMessages> = {
     defaultColor: '默认颜色',
     themeColors: '主题颜色',
     standardColors: '标准颜色',
-    moreColors: '更多颜色...'
+    moreColors: '更多颜色...',
+    pickerLabel: '颜色选择器'
   },
   'en-US': {
     defaultColor: 'Default',
     themeColors: 'Theme Colors',
     standardColors: 'Standard Colors',
-    moreColors: 'More Colors...'
+    moreColors: 'More Colors...',
+    pickerLabel: 'Color picker'
   },
   'ja-JP': {
     defaultColor: 'デフォルトカラー',
     themeColors: 'テーマカラー',
     standardColors: '標準カラー',
-    moreColors: 'その他のカラー...'
+    moreColors: 'その他のカラー...',
+    pickerLabel: 'カラーピッカー'
   }
 }
 
-const normalizeLocale = (locale?: string): ColorPickerLocale => {
-  if (!locale) {
-    return 'zh-CN'
-  }
+// 主题颜色
+const THEME_COLORS = [
+  '#000000', '#ffffff', '#eeece1', '#1e497b', '#4e81bb',
+  '#e2534d', '#9aba60', '#8165a0', '#47acc5', '#f9974c'
+] as const
 
-  const lowerLocale = locale.toLowerCase()
-  if (lowerLocale.startsWith('zh')) return 'zh-CN'
-  if (lowerLocale.startsWith('ja')) return 'ja-JP'
+// 标准颜色
+const STANDARD_COLORS = [
+  '#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b',
+  '#00af57', '#00afee', '#0071be', '#00215f', '#72349d'
+] as const
+
+// 色板渐变源 [深色, 浅色]
+const COLOR_CONFIG: ReadonlyArray<readonly [string, string]> = [
+  ['#7f7f7f', '#f2f2f2'],
+  ['#0d0d0d', '#808080'],
+  ['#1c1a10', '#ddd8c3'],
+  ['#0e243d', '#c6d9f0'],
+  ['#233f5e', '#dae5f0'],
+  ['#632623', '#f2dbdb'],
+  ['#4d602c', '#eaf1de'],
+  ['#3f3150', '#e6e0ec'],
+  ['#1e5867', '#d9eef3'],
+  ['#99490f', '#fee9da']
+]
+
+const GRADIENT_STEPS = 5
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+
+// 规范化 hex 字符串；非法输入回退到黑色
+const parseColor = (input: string): string => {
+  if (!input || typeof input !== 'string') return '#000000'
+  let hex = input.trim().toLowerCase()
+  if (!hex.startsWith('#')) hex = '#' + hex
+  if (/^#[0-9a-f]{3}$/.test(hex)) {
+    return '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3]
+  }
+  if (/^#[0-9a-f]{6}$/.test(hex)) return hex
+  return '#000000'
+}
+
+const hexToRgb = (hex: string): [number, number, number] => {
+  const h = parseColor(hex)
+  return [
+    parseInt(h.slice(1, 3), 16),
+    parseInt(h.slice(3, 5), 16),
+    parseInt(h.slice(5, 7), 16)
+  ]
+}
+
+const rgbToHex = (r: number, g: number, b: number): string => {
+  const toComp = (n: number) => clamp(Math.round(n), 0, 255).toString(16).padStart(2, '0')
+  return '#' + toComp(r) + toComp(g) + toComp(b)
+}
+
+const gradient = (start: string, end: string, step: number): string[] => {
+  const [sr, sg, sb] = hexToRgb(start)
+  const [er, eg, eb] = hexToRgb(end)
+  const rStep = (er - sr) / step
+  const gStep = (eg - sg) / step
+  const bStep = (eb - sb) / step
+  const out: string[] = []
+  for (let i = 0; i < step; i++) {
+    out.push(rgbToHex(sr + rStep * i, sg + gStep * i, sb + bStep * i))
+  }
+  return out
+}
+
+// 预计算一次的渐变面板：浅 -> 深
+const COLOR_PANEL: ReadonlyArray<ReadonlyArray<string>> = COLOR_CONFIG.map(
+  ([dark, light]) => gradient(light, dark, GRADIENT_STEPS)
+)
+
+const normalizeLocale = (locale?: string): ColorPickerLocale => {
+  if (!locale) return 'zh-CN'
+  const l = locale.toLowerCase()
+  if (l.startsWith('zh')) return 'zh-CN'
+  if (l.startsWith('ja')) return 'ja-JP'
   return 'en-US'
 }
 
 const detectLocale = (): ColorPickerLocale => {
   if (typeof document !== 'undefined') {
-    const documentLang = document.documentElement.lang
-    if (documentLang) {
-      return normalizeLocale(documentLang)
-    }
+    const lang = document.documentElement.lang
+    if (lang) return normalizeLocale(lang)
   }
-
-  if (typeof navigator !== 'undefined') {
-    return normalizeLocale(navigator.language)
-  }
-
+  if (typeof navigator !== 'undefined') return normalizeLocale(navigator.language)
   return 'zh-CN'
 }
+
+// MutationObserver 单例：所有组件实例共享一个 observer，引用计数为 0 时断开
+type LangListener = (locale: ColorPickerLocale) => void
+const langListeners = new Set<LangListener>()
+let sharedLangObserver: MutationObserver | null = null
+
+const subscribeLang = (cb: LangListener): (() => void) => {
+  langListeners.add(cb)
+  if (typeof document !== 'undefined' && !sharedLangObserver) {
+    sharedLangObserver = new MutationObserver(() => {
+      const next = detectLocale()
+      langListeners.forEach(fn => fn(next))
+    })
+    sharedLangObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['lang']
+    })
+  }
+  return () => {
+    langListeners.delete(cb)
+    if (langListeners.size === 0 && sharedLangObserver) {
+      sharedLangObserver.disconnect()
+      sharedLangObserver = null
+    }
+  }
+}
+</script>
+
+<script setup lang="ts">
+import { computed, nextTick, onBeforeUnmount, onMounted, shallowRef, useTemplateRef } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 
 const props = withDefaults(defineProps<{
   // 当前颜色
@@ -76,124 +182,70 @@ const props = withDefaults(defineProps<{
   locale?: ColorPickerLocale
   // 自定义文案
   messages?: Partial<ColorPickerMessages>
+  // 面板位置；默认 'auto' 由视口空间决定
+  placement?: ColorPickerPlacement
 }>(), {
   defaultColor: '#000000',
-  messages: () => ({})
+  messages: () => ({}),
+  placement: 'auto'
 })
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'change', value: string): void
+  (e: 'open'): void
+  (e: 'close'): void
+  (e: 'hover', color: string): void
 }>()
 
 // 面板状态
 const openStatus = shallowRef(false)
 const panelVerticalPlacement = shallowRef<'bottom' | 'top'>('bottom')
 const panelHorizontalPlacement = shallowRef<'left' | 'right'>('left')
-// 打开面板
-const openPanel = () => {
-  if (props.disabled) {
-    return
-  }
-
-  openStatus.value = !openStatus.value
-
-  if (openStatus.value) {
-    void nextTick(() => {
-      updatePanelPlacement()
-    })
-  }
-}
-const colorPicker = useTemplateRef<HTMLDivElement>('colorPicker')
-const colorPanelEl = useTemplateRef<HTMLDivElement>('colorPanelEl')
-// 关闭面板
-const closePanel = () => {
-  openStatus.value = false
-}
-onClickOutside(colorPicker, closePanel)
-
 // 鼠标经过的颜色块
 const hoverColor = shallowRef('')
-const handleHover = (color: string) => {
-  hoverColor.value = color
-}
-// 主题颜色
-const tColor = ['#000000', '#ffffff', '#eeece1', '#1e497b', '#4e81bb', '#e2534d', '#9aba60', '#8165a0', '#47acc5', '#f9974c']
-// 颜色面板
-const colorConfig = [
-    ['#7f7f7f', '#f2f2f2'],
-    ['#0d0d0d', '#808080'],
-    ['#1c1a10', '#ddd8c3'],
-    ['#0e243d', '#c6d9f0'],
-    ['#233f5e', '#dae5f0'],
-    ['#632623', '#f2dbdb'],
-    ['#4d602c', '#eaf1de'],
-    ['#3f3150', '#e6e0ec'],
-    ['#1e5867', '#d9eef3'],
-    ['#99490f', '#fee9da']
-  ]
-// 标准颜色
-const bColor = ['#c21401', '#ff1e02', '#ffc12a', '#ffff3a', '#90cf5b', '#00af57', '#00afee', '#0071be', '#00215f', '#72349d']
 
-const detectedLocale = shallowRef<ColorPickerLocale>(props.locale ? normalizeLocale(props.locale) : 'zh-CN')
-let documentLangObserver: MutationObserver | null = null
+// SSR 守恒：首屏始终取确定性的 fallback，onMounted 再校准。
+// 当 props.locale 存在时，resolvedLocale 直接走 props，detectedLocale 不参与，
+// 因此这里只需一个稳定的占位值。
+const detectedLocale = shallowRef<ColorPickerLocale>('zh-CN')
 
-onMounted(() => {
-  detectedLocale.value = detectLocale()
-
-  if (typeof document === 'undefined') {
-    return
-  }
-
-  documentLangObserver = new MutationObserver(() => {
-    detectedLocale.value = detectLocale()
-  })
-
-  documentLangObserver.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['lang']
-  })
-
-  window.addEventListener('resize', updatePanelPlacement)
-  window.addEventListener('scroll', updatePanelPlacement, true)
-})
-
-onBeforeUnmount(() => {
-  documentLangObserver?.disconnect()
-  documentLangObserver = null
-  window.removeEventListener('resize', updatePanelPlacement)
-  window.removeEventListener('scroll', updatePanelPlacement, true)
-})
-
-const resolvedLocale = computed<ColorPickerLocale>(() => {
-  return props.locale ? normalizeLocale(props.locale) : detectedLocale.value
-})
+const resolvedLocale = computed<ColorPickerLocale>(() =>
+  props.locale ? normalizeLocale(props.locale) : detectedLocale.value
+)
 
 const resolvedMessages = computed<ColorPickerMessages>(() => ({
   ...localeMessagesMap[resolvedLocale.value],
   ...props.messages
 }))
 
-// 计算属性：显示面板颜色
-const showPanelColor = computed(() => {
-  return hoverColor.value || showColor.value
-})
-// 计算属性：显示颜色
-const showColor = computed(() => {
-  return props.modelValue || props.defaultColor
-})
-// 计算属性：颜色面板
-const colorPanel = computed(() => {
-  const colorArr: string[][] = []
-  for (const color of colorConfig) {
-    colorArr.push(gradient(color[1], color[0], 5))
-  }
-  return colorArr
-})
+const showColor = computed(() => props.modelValue || props.defaultColor)
+const showPanelColor = computed(() => hoverColor.value || showColor.value)
 
+const colorPicker = useTemplateRef<HTMLDivElement>('colorPicker')
+const colorPanelEl = useTemplateRef<HTMLDivElement>('colorPanelEl')
+const triggerEl = useTemplateRef<HTMLDivElement>('triggerEl')
 const html5ColorEl = useTemplateRef<HTMLInputElement>('html5ColorEl')
+
+// rAF 合并的 placement 更新
+let placementRaf = 0
+const schedulePlacementUpdate = () => {
+  if (placementRaf) return
+  placementRaf = requestAnimationFrame(() => {
+    placementRaf = 0
+    updatePanelPlacement()
+  })
+}
+
 const updatePanelPlacement = () => {
-  if (!colorPicker.value || !colorPanelEl.value || !openStatus.value) {
+  if (!colorPicker.value || !colorPanelEl.value || !openStatus.value) return
+
+  const placement = parsePlacement(props.placement)
+
+  // 用户显式锁定的方向直接采用，无需测量
+  if (placement.vertical !== 'auto' && placement.horizontal !== 'auto') {
+    panelVerticalPlacement.value = placement.vertical
+    panelHorizontalPlacement.value = placement.horizontal
     return
   }
 
@@ -207,144 +259,247 @@ const updatePanelPlacement = () => {
   const spaceRight = viewportWidth - triggerRect.left
   const leftAvailableSpace = triggerRect.right
 
-  panelVerticalPlacement.value =
-    panelRect.height > spaceBelow && spaceAbove > spaceBelow ? 'top' : 'bottom'
+  panelVerticalPlacement.value = placement.vertical !== 'auto'
+    ? placement.vertical
+    : (panelRect.height > spaceBelow && spaceAbove > spaceBelow ? 'top' : 'bottom')
 
-  panelHorizontalPlacement.value =
-    panelRect.width > spaceRight && leftAvailableSpace > spaceRight ? 'right' : 'left'
+  panelHorizontalPlacement.value = placement.horizontal !== 'auto'
+    ? placement.horizontal
+    : (panelRect.width > spaceRight && leftAvailableSpace > spaceRight ? 'right' : 'left')
 }
 
-const triggerHtml5Color = () => {
-  html5ColorEl.value?.click()
+const attachViewportListeners = () => {
+  window.addEventListener('resize', schedulePlacementUpdate)
+  window.addEventListener('scroll', schedulePlacementUpdate, true)
 }
+
+const detachViewportListeners = () => {
+  window.removeEventListener('resize', schedulePlacementUpdate)
+  window.removeEventListener('scroll', schedulePlacementUpdate, true)
+  if (placementRaf) {
+    cancelAnimationFrame(placementRaf)
+    placementRaf = 0
+  }
+}
+
+const openPanel = () => {
+  if (props.disabled || openStatus.value) return
+  // 同步先把用户锁定的方向写入，避免首帧 bottom-left → 目标位置闪烁
+  const p = parsePlacement(props.placement)
+  if (p.vertical !== 'auto') panelVerticalPlacement.value = p.vertical
+  if (p.horizontal !== 'auto') panelHorizontalPlacement.value = p.horizontal
+  openStatus.value = true
+  // 完全锁定时视口变化不影响位置，无需挂 viewport listeners
+  const needsAutoMeasure = p.vertical === 'auto' || p.horizontal === 'auto'
+  if (needsAutoMeasure) {
+    attachViewportListeners()
+    void nextTick(updatePanelPlacement)
+  }
+  emits('open')
+}
+
+const closePanel = () => {
+  if (!openStatus.value) return
+  openStatus.value = false
+  detachViewportListeners()
+  emits('close')
+}
+
+const togglePanel = () => {
+  if (props.disabled) return
+  if (openStatus.value) closePanel()
+  else openPanel()
+}
+
+onClickOutside(colorPicker, closePanel)
+
+const focusTrigger = () => {
+  void nextTick(() => triggerEl.value?.focus())
+}
+
 // 更新组件的值
 const updateValue = (value: string) => {
   emits('update:modelValue', value)
   emits('change', value)
-  openStatus.value = false
-}
-// 设置默认颜色
-const handleDefaultColor = () => {
-  updateValue(props.defaultColor)
+  closePanel()
+  focusTrigger()
 }
 
+const handleDefaultColor = () => updateValue(props.defaultColor)
+const handleHover = (color: string) => {
+  hoverColor.value = color
+  emits('hover', color)
+}
+const triggerHtml5Color = () => html5ColorEl.value?.click()
 const handleHtml5ColorChange = (event: Event) => {
-  const value = (event.target as HTMLInputElement).value
-  updateValue(value)
+  updateValue((event.target as HTMLInputElement).value)
 }
 
-/**
- * 颜色计算
- */
-// 格式化 hex 颜色值
-const parseColor = (hexStr: string) => {
-  if (hexStr.length === 4) {
-    return '#' + hexStr[1] + hexStr[1] + hexStr[2] + hexStr[2] + hexStr[3] + hexStr[3]
-  } else {
-    return hexStr
+// 键盘交互
+const onTriggerKeydown = (e: KeyboardEvent) => {
+  if (props.disabled) return
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    togglePanel()
+  } else if (e.key === 'Escape' && openStatus.value) {
+    e.preventDefault()
+    closePanel()
+  } else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !openStatus.value) {
+    e.preventDefault()
+    openPanel()
   }
 }
-// RGB 颜色 转 HEX 颜色
-const rgbToHex = (r: number, g: number, b: number) => {
-  const hex = ((r << 16) | (g << 8) | b).toString(16)
-  return '#' + new Array(Math.abs(hex.length - 7)).join('0') + hex
-}
-// HEX 转 RGB 颜色
-const hexToRgb = (hex: string) => {
-  hex = parseColor(hex)
-  const rgb = []
-  for (let i = 1; i < 7; i += 2) {
-    rgb.push(parseInt('0x' + hex.slice(i, i + 2)))
+
+const onPanelKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    closePanel()
+    focusTrigger()
   }
-  return rgb
 }
-// 计算渐变过渡颜色
-const gradient = (startColor: string, endColor: string, step: number) => {
-  // 讲 hex 转换为 rgb
-  const sColor = hexToRgb(startColor)
-  const eColor = hexToRgb(endColor)
-  // 计算R\G\B每一步的差值
-  const rStep = (eColor[0] - sColor[0]) / step
-  const gStep = (eColor[1] - sColor[1]) / step
-  const bStep = (eColor[2] - sColor[2]) / step
-  const gradientColorArr = []
-  // 计算每一步的hex值
-  for (let i = 0; i < step; i++) {
-    gradientColorArr.push(rgbToHex(rStep * i + sColor[0], gStep * i + sColor[1], bStep * i + sColor[2]))
+
+const onActivate = (e: KeyboardEvent, handler: () => void) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    handler()
   }
-  return gradientColorArr
 }
+
+let unsubscribeLang: (() => void) | null = null
+
+onMounted(() => {
+  if (!props.locale) detectedLocale.value = detectLocale()
+  unsubscribeLang = subscribeLang((next) => {
+    if (!props.locale) detectedLocale.value = next
+  })
+})
+
+onBeforeUnmount(() => {
+  unsubscribeLang?.()
+  unsubscribeLang = null
+  detachViewportListeners()
+})
+
+defineExpose<ColorPickerExposed>({
+  open: openPanel,
+  close: closePanel,
+  focus: () => triggerEl.value?.focus()
+})
 </script>
 
 <template>
-  <div class="m-colorPicker" :class="{ open: openStatus }" ref="colorPicker" @click="event => { event.stopPropagation() }">
-    <!-- 颜色显示小方块 -->
-    <div class="colorBtn"
-      :style="`background-color: ${showColor}`"
-      @click="openPanel"
-      :class="{ disabled: disabled }"
+  <div class="m-colorPicker" :class="{ open: openStatus }" ref="colorPicker">
+    <!-- 颜色显示小方块（兼具触发按钮） -->
+    <div
+      ref="triggerEl"
+      class="colorBtn"
+      role="button"
+      :tabindex="disabled ? -1 : 0"
+      aria-haspopup="dialog"
+      :aria-expanded="openStatus"
+      :aria-disabled="disabled || undefined"
+      :aria-label="`${resolvedMessages.pickerLabel}, ${showColor}`"
+      :style="{ backgroundColor: showColor }"
+      :class="{ disabled }"
+      @click="togglePanel"
+      @keydown="onTriggerKeydown"
     ></div>
     <!-- 颜色色盘 -->
     <div
       ref="colorPanelEl"
       class="box"
+      role="dialog"
+      aria-modal="false"
+      :aria-hidden="!openStatus"
+      :aria-label="resolvedMessages.pickerLabel"
       :class="{
         open: openStatus,
         'placement-top': panelVerticalPlacement === 'top',
         'placement-right': panelHorizontalPlacement === 'right'
       }"
+      @keydown="onPanelKeydown"
     >
       <div class="hd">
         <div class="colorView" :style="{ backgroundColor: showPanelColor }"></div>
-        <div class="defaultColor"
+        <div
+          class="defaultColor"
+          role="button"
+          tabindex="0"
           @click="handleDefaultColor"
+          @keydown="(e) => onActivate(e, handleDefaultColor)"
           @mouseover="handleHover(defaultColor)"
           @mouseout="handleHover('')"
         >{{ resolvedMessages.defaultColor }}</div>
       </div>
       <div class="bd">
         <h3>{{ resolvedMessages.themeColors }}</h3>
-        <ul class="tColor">
+        <ul class="tColor" role="grid">
           <li
-            v-for="(color, index) of tColor"
+            v-for="(color, index) of THEME_COLORS"
             :key="index"
+            role="gridcell"
+            tabindex="0"
+            :aria-label="color"
             :style="{ backgroundColor: color }"
             @mouseover="handleHover(color)"
             @mouseout="handleHover('')"
             @click="updateValue(color)"
+            @keydown="(e) => onActivate(e, () => updateValue(color))"
           ></li>
         </ul>
-        <ul class="bColor">
-          <li v-for="(item, index) of colorPanel" :key="index">
+        <ul class="bColor" role="grid">
+          <li v-for="(item, index) of COLOR_PANEL" :key="index" role="row">
             <ul>
               <li
                 v-for="(color, cindex) of item"
                 :key="cindex"
+                role="gridcell"
+                tabindex="0"
+                :aria-label="color"
                 :style="{ backgroundColor: color }"
                 @mouseover="handleHover(color)"
                 @mouseout="handleHover('')"
                 @click="updateValue(color)"
+                @keydown="(e) => onActivate(e, () => updateValue(color))"
               ></li>
             </ul>
           </li>
         </ul>
         <h3>{{ resolvedMessages.standardColors }}</h3>
-        <ul class="tColor">
+        <ul class="tColor" role="grid">
           <li
-            v-for="(color, index) of bColor"
+            v-for="(color, index) of STANDARD_COLORS"
             :key="index"
+            role="gridcell"
+            tabindex="0"
+            :aria-label="color"
             :style="{ backgroundColor: color }"
             @mouseover="handleHover(color)"
             @mouseout="handleHover('')"
             @click="updateValue(color)"
+            @keydown="(e) => onActivate(e, () => updateValue(color))"
           ></li>
         </ul>
-        <h3 @click="triggerHtml5Color">{{ resolvedMessages.moreColors }}</h3>
-        <!-- 用以激活HTML5颜色面板 -->
-        <input type="color"
+        <h3
+          class="moreColors"
+          role="button"
+          tabindex="0"
+          @click="triggerHtml5Color"
+          @keydown="(e) => onActivate(e, triggerHtml5Color)"
+        >{{ resolvedMessages.moreColors }}</h3>
+        <!--
+          用以激活 HTML5 原生颜色面板。
+          监听 @change（用户在原生面板里点确定）而非 @input（拖动持续触发），
+          避免拖动时反复 emit + focusTrigger 抢焦点。
+        -->
+        <input
+          type="color"
           ref="html5ColorEl"
+          aria-hidden="true"
+          tabindex="-1"
           :value="showColor"
-          @input="handleHtml5ColorChange">
+          @change="handleHtml5ColorChange"
+        >
       </div>
     </div>
   </div>
@@ -352,18 +507,41 @@ const gradient = (startColor: string, endColor: string, step: number) => {
 
 <style lang="scss">
 .m-colorPicker{
+  // CSS Variables - 可被外部覆盖以定制主题
+  --vcp-swatch-size: 15px;
+  --vcp-panel-width: 190px;
+  --vcp-panel-bg: #fff;
+  --vcp-panel-border: 1px solid #ddd;
+  --vcp-panel-radius: 2px;
+  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  --vcp-panel-padding: 10px;
+  --vcp-text-color: #333;
+  --vcp-focus-color: #4e81bb;
+  --vcp-transition: .3s ease;
+  --vcp-z-index: 10000;
+
   position: relative; text-align: left; font-size: 14px; display: inline-block;
   outline: none;
   ul,li,ol{ list-style: none; margin: 0; padding: 0; }
-  .colorBtn{ width: 15px; height: 15px; }
+  .colorBtn{ width: var(--vcp-swatch-size); height: var(--vcp-swatch-size); cursor: pointer; }
   .colorBtn.disabled{ cursor: no-drop; }
-  &.open{ z-index: 10000; }
+  .colorBtn:focus-visible{ outline: 2px solid var(--vcp-focus-color); outline-offset: 2px; }
+  &.open{ z-index: var(--vcp-z-index); }
   .box{
-    position: absolute; top: calc(100% + 2px); left: 0; width: 190px; background: #fff; border: 1px solid #ddd; visibility: hidden; border-radius: 2px; margin-top: 0; padding: 10px; padding-bottom: 5px; box-shadow: 0 8px 24px rgba(0,0,0,.18); opacity: 0; transition: all .3s ease;
+    position: absolute; top: calc(100% + 2px); left: 0;
+    width: var(--vcp-panel-width);
+    background: var(--vcp-panel-bg);
+    border: var(--vcp-panel-border);
+    border-radius: var(--vcp-panel-radius);
+    box-shadow: var(--vcp-panel-shadow);
+    padding: var(--vcp-panel-padding); padding-bottom: 5px;
+    visibility: hidden; margin-top: 0; opacity: 0; transition: all var(--vcp-transition);
     box-sizing: content-box;
     z-index: 1;
     pointer-events: none;
-    h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: #333; }
+    h3{ margin: 0; font-size: 14px; font-weight: normal; margin-top: 10px; margin-bottom: 5px; line-height: 1; color: var(--vcp-text-color); }
+    h3.moreColors{ cursor: pointer; }
+    h3.moreColors:focus-visible{ outline: 1px dashed var(--vcp-focus-color); outline-offset: 2px; }
     input {
       visibility: hidden;
       position: absolute;
@@ -376,18 +554,21 @@ const gradient = (startColor: string, endColor: string, step: number) => {
   .box.open{ visibility: visible; opacity: 1; pointer-events: auto; }
   .hd{
     overflow: hidden; line-height: 29px;
-    .colorView{ width: 100px; height: 30px; float: left; transition: background-color .3s ease; }
-    .defaultColor{ width: 80px; float: right; text-align: center; border: 1px solid #ddd; cursor: pointer; color: #333; }
+    .colorView{ width: 100px; height: 30px; float: left; transition: background-color var(--vcp-transition); }
+    .defaultColor{ width: 80px; float: right; text-align: center; border: var(--vcp-panel-border); cursor: pointer; color: var(--vcp-text-color); box-sizing: border-box; }
+    .defaultColor:focus-visible{ outline: 2px solid var(--vcp-focus-color); outline-offset: 1px; }
   }
   .tColor{
-    li{ width: 15px; height: 15px; display: inline-block; margin: 0 2px; transition: all .3s ease; }
+    li{ width: var(--vcp-swatch-size); height: var(--vcp-swatch-size); display: inline-block; margin: 0 2px; transition: all var(--vcp-transition); cursor: pointer; }
     li:hover{ box-shadow: 0 0 5px rgba(0,0,0,.4); transform: scale(1.3); }
+    li:focus-visible{ outline: none; box-shadow: 0 0 0 2px var(--vcp-focus-color); position: relative; z-index: 1; }
   }
   .bColor{
     li{
-      width: 15px; display: inline-block; margin: 0 2px;
-      li{ display: block; width: 15px; height: 15px; transition: all .3s ease; margin: 0; }
+      width: var(--vcp-swatch-size); display: inline-block; margin: 0 2px;
+      li{ display: block; width: var(--vcp-swatch-size); height: var(--vcp-swatch-size); transition: all var(--vcp-transition); margin: 0; cursor: pointer; }
       li:hover{ box-shadow: 0 0 5px rgba(0,0,0,.4); transform: scale(1.3); }
+      li:focus-visible{ outline: none; box-shadow: 0 0 0 2px var(--vcp-focus-color); position: relative; z-index: 1; }
     }
   }
 }

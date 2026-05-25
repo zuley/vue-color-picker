@@ -3,7 +3,7 @@ layout: home
 hero:
   name: vColorPicker
   text: Vue 3 Color Picker
-  tagline: A lightweight, easy-to-use color picker component for Vue 3
+  tagline: A lightweight, accessible color picker component for Vue 3
   actions:
     - theme: brand
       text: Get Started
@@ -14,11 +14,13 @@ hero:
 
 features:
   - title: Easy to Use
-    details: Simple API with v-model support, optimized UI with rounded corners and smooth transitions
-  - title: npm Package
-    details: Install via npm and register as a global component, ready to use in any Vue 3 project
-  - title: HTML5 Color Picker
-    details: Supports "More Colors" via native HTML5 color input in compatible browsers
+    details: Simple v-model API with rounded corners, smooth transitions, and a refined UI
+  - title: Accessible
+    details: Full keyboard navigation, ARIA roles, focus management — works with screen readers out of the box
+  - title: SSR Friendly
+    details: Deterministic first paint, hydration-safe locale detection, single shared MutationObserver
+  - title: Themeable
+    details: Override CSS Variables for colors and sizing — no selector piercing required
 ---
 
 <script setup>
@@ -26,6 +28,7 @@ import { ref } from 'vue'
 const color = ref('#ff0000')
 const englishColor = ref('#3b82f6')
 const japaneseColor = ref('#10b981')
+const topColor = ref('#f59e0b')
 </script>
 
 ## Demo
@@ -52,6 +55,20 @@ const japaneseColor = ref('#10b981')
     :messages="{ moreColors: 'Custom Label...' }"
   />
 </template>
+```
+
+## Placement
+
+The panel auto-detects available viewport space by default. You can lock it to any side with the `placement` prop.
+
+<div class="demo-container">
+  <colorPicker v-model="topColor" placement="top-end" />
+  <p>Pinned to <code>top-end</code>: <code>{{ topColor }}</code></p>
+</div>
+
+```vue
+<colorPicker v-model="color" placement="top-end" />
+<colorPicker v-model="color" placement="bottom" /> <!-- vertical locked, horizontal auto -->
 ```
 
 ## Installation
@@ -87,24 +104,116 @@ const color = ref('#ff0000')
 </script>
 ```
 
-## Options
+## Props
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `v-model` | `string` | - | Current color value |
-| `defaultColor` | `string` | `#000000` | Default color when reset |
+| `v-model` / `modelValue` | `string` | — | Current color value |
+| `defaultColor` | `string` | `#000000` | Color the "Default" button resets to |
 | `disabled` | `boolean` | `false` | Disabled state |
-| `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | Auto | Built-in locale used by panel labels, follows page language when omitted |
-| `messages` | `Partial<ColorPickerMessages>` | - | Override built-in labels with custom text |
+| `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | Auto | Built-in panel labels; follows `<html lang>` / `navigator.language` when omitted |
+| `messages` | `Partial<ColorPickerMessages>` | — | Override built-in labels with custom text |
+| `placement` | `ColorPickerPlacement` | `'auto'` | Panel placement: `'auto'`, `'top'`, `'bottom'`, `'top-start'`, `'top-end'`, `'bottom-start'`, `'bottom-end'`. `'auto'` picks based on available viewport space; directional values lock that axis |
 
 ## Events
 
 | Event | Payload | Description |
 | --- | --- | --- |
-| `change` | `(color: string)` | Triggered when color value changes |
+| `change` | `(color: string)` | Color value changed |
+| `update:modelValue` | `(color: string)` | `v-model` sync event |
+| `open` | — | Panel opened |
+| `close` | — | Panel closed (outside click, `Esc`, or after selection) |
+| `hover` | `(color: string)` | Swatch hover; emits empty string on leave |
 
 ```vue
 <colorPicker v-model="color" @change="onColorChange" />
+```
+
+## Imperative API
+
+Methods exposed via template ref:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { ColorPickerInstance } from 'vcolorpicker'
+
+const pickerRef = ref<ColorPickerInstance>()
+const color = ref('#ff0000')
+
+const openProgrammatically = () => pickerRef.value?.open()
+</script>
+
+<template>
+  <colorPicker ref="pickerRef" v-model="color" />
+  <button @click="openProgrammatically">Open Panel</button>
+</template>
+```
+
+| Method | Description |
+| --- | --- |
+| `open()` | Open the panel (no-op when `disabled`) |
+| `close()` | Close the panel |
+| `focus()` | Move focus back to the trigger button |
+
+## Accessibility
+
+- Trigger button and every swatch are reachable via `Tab`
+- `Enter` / `Space` activates; `↑` / `↓` on a focused trigger also opens the panel
+- `Esc` closes the panel and returns focus to the trigger
+- Trigger carries `role="button"`, `aria-haspopup="dialog"`, `aria-expanded`; the panel uses `role="dialog"`; every swatch has `aria-label="#RRGGBB"`
+- Focus rings use `:focus-visible`, so mouse users are not distracted
+
+## SSR / Nuxt
+
+- When `document` / `navigator` are unavailable (Node SSR), the initial locale falls back to `zh-CN` (or the explicit `locale` prop) so server and client render identically — no hydration mismatch
+- Real language detection runs after `onMounted`. To avoid a post-mount flicker from Chinese to another language, **pass an explicit `locale` prop in SSR projects**
+- The `MutationObserver` watching `<html lang>` is a module-level singleton — multiple component instances share a single observer
+
+## CSS Variables
+
+Override these custom properties to theme the component without piercing selectors:
+
+```css
+.m-colorPicker {
+  --vcp-swatch-size: 15px;
+  --vcp-panel-width: 190px;
+  --vcp-panel-bg: #fff;
+  --vcp-panel-border: 1px solid #ddd;
+  --vcp-panel-radius: 2px;
+  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  --vcp-panel-padding: 10px;
+  --vcp-text-color: #333;
+  --vcp-focus-color: #4e81bb;
+  --vcp-transition: .3s ease;
+  --vcp-z-index: 10000;
+}
+```
+
+Example — dark theme:
+
+```css
+.dark .m-colorPicker {
+  --vcp-panel-bg: #1f1f1f;
+  --vcp-panel-border: 1px solid #333;
+  --vcp-text-color: #eee;
+}
+```
+
+## TypeScript
+
+Types exported from the package:
+
+```ts
+import type {
+  ColorPickerProps,
+  ColorPickerEmits,
+  ColorPickerExposed,
+  ColorPickerInstance,
+  ColorPickerLocale,
+  ColorPickerMessages,
+  ColorPickerPlacement
+} from 'vcolorpicker'
 ```
 
 ## FAQ
@@ -119,11 +228,15 @@ Yes. Set `locale="zh-CN"`, `locale="en-US"` or `locale="ja-JP"` to use built-in 
 
 ### Does it work with TypeScript?
 
-Yes. The package ships with TypeScript declaration files for component props and plugin installation.
+Yes. The package ships with full type declarations — props, emits, instance methods, and helper types.
 
 ### Does it support the native browser color picker?
 
 Yes. Clicking `More Colors...` opens the native HTML5 color input in supported browsers.
+
+### Is it accessible to keyboard and screen reader users?
+
+Yes. `Tab` to focus, `Enter` / `Space` to activate, `Esc` to close, and ARIA roles / labels are all wired up.
 
 ## Sponsors
 

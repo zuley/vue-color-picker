@@ -3,7 +3,7 @@ layout: home
 hero:
   name: vColorPicker
   text: Vue 3 颜色选择器
-  tagline: 轻量、易用的 Vue 3 颜色选择器组件
+  tagline: 轻量、可访问的 Vue 3 颜色选择器组件
   actions:
     - theme: brand
       text: 快速开始
@@ -14,11 +14,13 @@ hero:
 
 features:
   - title: 简单易用
-    details: 简洁的 API，支持 v-model，UI 优化增加了圆角和过渡动画
-  - title: npm 安装
-    details: 以 npm 形式安装，注册为全局组件，可在任何 Vue 3 项目中使用
-  - title: HTML5 取色器
-    details: 在支持的浏览器中通过 HTML5 原生 color input 实现「更多颜色」功能
+    details: 简洁的 v-model API，UI 圆角和过渡动画都已就位
+  - title: 可访问性完善
+    details: 完整的键盘导航、ARIA 角色和焦点管理，开箱即用支持屏幕阅读器
+  - title: SSR 友好
+    details: 首屏渲染确定性，hydration 安全，语言检测延后到挂载之后
+  - title: 主题化
+    details: 通过覆盖 CSS Variables 自定义配色和尺寸，无需选择器穿透
 ---
 
 <script setup>
@@ -26,6 +28,7 @@ import { ref } from 'vue'
 const color = ref('#ff0000')
 const englishColor = ref('#3b82f6')
 const japaneseColor = ref('#10b981')
+const topColor = ref('#f59e0b')
 </script>
 
 ## Demo
@@ -52,6 +55,20 @@ const japaneseColor = ref('#10b981')
     :messages="{ moreColors: '自定义文案...' }"
   />
 </template>
+```
+
+## 面板位置
+
+默认按视口剩余空间自动选位，也可以通过 `placement` 锁定到任意一侧。
+
+<div class="demo-container">
+  <colorPicker v-model="topColor" placement="top-end" />
+  <p>固定到 <code>top-end</code>: <code>{{ topColor }}</code></p>
+</div>
+
+```vue
+<colorPicker v-model="color" placement="top-end" />
+<colorPicker v-model="color" placement="bottom" /> <!-- 锁定向下，水平自动 -->
 ```
 
 <div id="installation"></div>
@@ -89,24 +106,116 @@ const color = ref('#ff0000')
 </script>
 ```
 
-## 选项
+## 属性 Props
 
 | 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `v-model` | `string` | - | 当前颜色值 |
-| `defaultColor` | `string` | `#000000` | 重置时的默认颜色 |
+| `v-model` / `modelValue` | `string` | — | 当前颜色值 |
+| `defaultColor` | `string` | `#000000` | 「默认颜色」按钮重置使用的颜色 |
 | `disabled` | `boolean` | `false` | 禁用状态 |
-| `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | 自动识别 | 面板内置文案语言，不传时自动跟随当前页面语言 |
-| `messages` | `Partial<ColorPickerMessages>` | - | 用自定义文案覆盖内置语言包 |
+| `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | 自动检测 | 面板内置文案语言；不传时跟随 `<html lang>` / `navigator.language` |
+| `messages` | `Partial<ColorPickerMessages>` | — | 用自定义文案覆盖内置语言包 |
+| `placement` | `ColorPickerPlacement` | `'auto'` | 面板位置：`'auto'` / `'top'` / `'bottom'` / `'top-start'` / `'top-end'` / `'bottom-start'` / `'bottom-end'`。`'auto'` 根据视口剩余空间自动决定；带方向时锁定对应轴 |
 
 ## 事件
 
 | 事件名 | 参数 | 说明 |
 | --- | --- | --- |
 | `change` | `(color: string)` | 颜色值改变时触发 |
+| `update:modelValue` | `(color: string)` | `v-model` 同步事件 |
+| `open` | — | 面板打开时触发 |
+| `close` | — | 面板关闭时触发（点击外部 / Esc / 选色后自动关闭）|
+| `hover` | `(color: string)` | 鼠标移到色块时触发；离开时携带空字符串 |
 
 ```vue
 <colorPicker v-model="color" @change="onColorChange" />
+```
+
+## 命令式 API
+
+通过模板 ref 暴露的方法可命令式控制组件：
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { ColorPickerInstance } from 'vcolorpicker'
+
+const pickerRef = ref<ColorPickerInstance>()
+const color = ref('#ff0000')
+
+const openProgrammatically = () => pickerRef.value?.open()
+</script>
+
+<template>
+  <colorPicker ref="pickerRef" v-model="color" />
+  <button @click="openProgrammatically">打开面板</button>
+</template>
+```
+
+| 方法 | 说明 |
+| --- | --- |
+| `open()` | 打开面板（`disabled` 时无效）|
+| `close()` | 关闭面板 |
+| `focus()` | 把焦点移回触发按钮 |
+
+## 可访问性 (a11y)
+
+- 触发按钮和所有色块都可通过 `Tab` 聚焦
+- `Enter` / `Space` 激活；触发按钮聚焦时按 `↑` / `↓` 也可打开面板
+- 面板打开后按 `Esc` 关闭并把焦点送回触发按钮
+- 触发按钮带 `role="button"` + `aria-haspopup="dialog"` + `aria-expanded`；面板带 `role="dialog"`；每个色块带 `aria-label="#RRGGBB"`
+- 焦点环使用 `:focus-visible`，鼠标用户不会被打扰
+
+## SSR / Nuxt
+
+- 在 Node 环境无 `document` / `navigator` 时，初始 locale 固定为 `zh-CN`（或显式 `locale` prop），保证服务端和客户端首屏一致，无 hydration mismatch
+- 真正的语言检测在 `onMounted` 后才执行。如果要避免挂载后从中文跳变到其他语言的闪动，**建议在 SSR 场景显式传 `locale` prop**
+- 监听 `<html lang>` 变化的 `MutationObserver` 是模块级单例，多实例只占一份资源
+
+## CSS Variables 主题化
+
+无需穿透选择器，覆盖以下变量即可：
+
+```css
+.m-colorPicker {
+  --vcp-swatch-size: 15px;
+  --vcp-panel-width: 190px;
+  --vcp-panel-bg: #fff;
+  --vcp-panel-border: 1px solid #ddd;
+  --vcp-panel-radius: 2px;
+  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  --vcp-panel-padding: 10px;
+  --vcp-text-color: #333;
+  --vcp-focus-color: #4e81bb;
+  --vcp-transition: .3s ease;
+  --vcp-z-index: 10000;
+}
+```
+
+例：暗色主题
+
+```css
+.dark .m-colorPicker {
+  --vcp-panel-bg: #1f1f1f;
+  --vcp-panel-border: 1px solid #333;
+  --vcp-text-color: #eee;
+}
+```
+
+## TypeScript
+
+包内导出的类型：
+
+```ts
+import type {
+  ColorPickerProps,
+  ColorPickerEmits,
+  ColorPickerExposed,
+  ColorPickerInstance,
+  ColorPickerLocale,
+  ColorPickerMessages,
+  ColorPickerPlacement
+} from 'vcolorpicker'
 ```
 
 ## 常见问题
@@ -117,15 +226,19 @@ const color = ref('#ff0000')
 
 ### 可以切换组件面板语言吗？
 
-可以。你可以通过 `locale="zh-CN"`、`locale="en-US"` 或 `locale="ja-JP"` 使用内置文案，也可以通过 `messages` 自定义覆盖面板文字。
+可以。通过 `locale="zh-CN"`、`locale="en-US"` 或 `locale="ja-JP"` 使用内置文案，也可以通过 `messages` 自定义覆盖面板文字。
 
 ### 这个组件支持 TypeScript 吗？
 
-支持。当前包已经包含组件属性和插件注册所需的 TypeScript 类型声明。
+支持。当前包提供完整的类型声明：props、emits、实例方法和辅助类型都有导出。
 
 ### 是否支持浏览器原生取色器？
 
 支持。点击 `更多颜色...` 后，会在兼容浏览器中调用 HTML5 原生取色器。
+
+### 键盘和屏幕阅读器能用吗？
+
+可以。`Tab` 聚焦、`Enter` / `Space` 激活、`Esc` 关闭，ARIA 角色和标签都已配置完整。
 
 ## 赞助
 
