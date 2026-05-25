@@ -25,6 +25,7 @@ features:
 import { ref } from 'vue'
 const color = ref('#ff0000')
 const englishColor = ref('#3b82f6')
+const japaneseColor = ref('#10b981')
 </script>
 
 ## Demo
@@ -39,6 +40,8 @@ const englishColor = ref('#3b82f6')
 <div class="demo-container">
   <colorPicker v-model="englishColor" locale="en-US" />
   <p>英文文案: <code>{{ englishColor }}</code></p>
+  <colorPicker v-model="japaneseColor" locale="ja-JP" />
+  <p>日文文案: <code>{{ japaneseColor }}</code></p>
 </div>
 
 ```vue
@@ -93,7 +96,7 @@ const color = ref('#ff0000')
 | `v-model` | `string` | - | 当前颜色值 |
 | `defaultColor` | `string` | `#000000` | 重置时的默认颜色 |
 | `disabled` | `boolean` | `false` | 禁用状态 |
-| `locale` | `'zh-CN' \| 'en-US'` | 自动识别 | 面板内置文案语言，不传时自动跟随当前页面语言 |
+| `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | 自动识别 | 面板内置文案语言，不传时自动跟随当前页面语言 |
 | `messages` | `Partial<ColorPickerMessages>` | - | 用自定义文案覆盖内置语言包 |
 
 ## 事件
@@ -114,7 +117,7 @@ const color = ref('#ff0000')
 
 ### 可以切换组件面板语言吗？
 
-可以。你可以通过 `locale="zh-CN"` 或 `locale="en-US"` 使用内置文案，也可以通过 `messages` 自定义覆盖面板文字。
+可以。你可以通过 `locale="zh-CN"`、`locale="en-US"` 或 `locale="ja-JP"` 使用内置文案，也可以通过 `messages` 自定义覆盖面板文字。
 
 ### 这个组件支持 TypeScript 吗？
 

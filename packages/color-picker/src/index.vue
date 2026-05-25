@@ -9,7 +9,7 @@ export default {
 import { computed, nextTick, onBeforeUnmount, onMounted, shallowRef, useTemplateRef } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 
-type ColorPickerLocale = 'zh-CN' | 'en-US'
+type ColorPickerLocale = 'zh-CN' | 'en-US' | 'ja-JP'
 
 interface ColorPickerMessages {
   defaultColor: string
@@ -30,6 +30,12 @@ const localeMessagesMap: Record<ColorPickerLocale, ColorPickerMessages> = {
     themeColors: 'Theme Colors',
     standardColors: 'Standard Colors',
     moreColors: 'More Colors...'
+  },
+  'ja-JP': {
+    defaultColor: 'デフォルトカラー',
+    themeColors: 'テーマカラー',
+    standardColors: '標準カラー',
+    moreColors: 'その他のカラー...'
   }
 }
 
@@ -38,7 +44,10 @@ const normalizeLocale = (locale?: string): ColorPickerLocale => {
     return 'zh-CN'
   }
 
-  return locale.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US'
+  const lowerLocale = locale.toLowerCase()
+  if (lowerLocale.startsWith('zh')) return 'zh-CN'
+  if (lowerLocale.startsWith('ja')) return 'ja-JP'
+  return 'en-US'
 }
 
 const detectLocale = (): ColorPickerLocale => {

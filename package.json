@@ -69,6 +69,7 @@
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
+    "@vue/server-renderer": "^3.5.34",
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.3.0",
     "eslint-plugin-vue": "^10.9.0",

@@ -25,6 +25,7 @@ features:
 import { ref } from 'vue'
 const color = ref('#ff0000')
 const englishColor = ref('#3b82f6')
+const japaneseColor = ref('#10b981')
 </script>
 
 ## Demo
@@ -39,6 +40,8 @@ const englishColor = ref('#3b82f6')
 <div class="demo-container">
   <colorPicker v-model="englishColor" locale="en-US" />
   <p>English locale: <code>{{ englishColor }}</code></p>
+  <colorPicker v-model="japaneseColor" locale="ja-JP" />
+  <p>Japanese locale: <code>{{ japaneseColor }}</code></p>
 </div>
 
 ```vue
@@ -91,7 +94,7 @@ const color = ref('#ff0000')
 | `v-model` | `string` | - | Current color value |
 | `defaultColor` | `string` | `#000000` | Default color when reset |
 | `disabled` | `boolean` | `false` | Disabled state |
-| `locale` | `'zh-CN' \| 'en-US'` | Auto | Built-in locale used by panel labels, follows page language when omitted |
+| `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | Auto | Built-in locale used by panel labels, follows page language when omitted |
 | `messages` | `Partial<ColorPickerMessages>` | - | Override built-in labels with custom text |
 
 ## Events
@@ -112,7 +115,7 @@ Yes. vColorPicker is built for Vue 3 and can be used with a standard `v-model` A
 
 ### Can I switch the panel language?
 
-Yes. Set `locale="zh-CN"` or `locale="en-US"` to use built-in translations, or pass `messages` to override any label.
+Yes. Set `locale="zh-CN"`, `locale="en-US"` or `locale="ja-JP"` to use built-in translations, or pass `messages` to override any label.
 
 ### Does it work with TypeScript?
 

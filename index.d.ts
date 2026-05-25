@@ -1,6 +1,6 @@
 import type { DefineComponent, Plugin } from 'vue'
 
-export type ColorPickerLocale = 'zh-CN' | 'en-US'
+export type ColorPickerLocale = 'zh-CN' | 'en-US' | 'ja-JP'
 
 export interface ColorPickerMessages {
   defaultColor: string

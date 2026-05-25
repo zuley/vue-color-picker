@@ -88,7 +88,7 @@ Vue.use(vcolorpicker)
 你可以通过在所在的元素上设置以下属性来配置`color-picker`
 1. `defaultColor`：默认颜色，如`defaultColor="#ff0000"`
 2. `disabled`：禁用状态，如`disabled=true`
-3. `locale`：内置语言，可选值为`zh-CN`和`en-US`，不传时自动跟随当前页面语言
+3. `locale`：内置语言，可选值为`zh-CN`、`en-US`和`ja-JP`，不传时自动跟随当前页面语言
 4. `messages`：自定义文案对象，可覆盖`defaultColor`、`themeColors`、`standardColors`、`moreColors`
 
 ## 事件
