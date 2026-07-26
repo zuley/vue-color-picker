@@ -1,6 +1,6 @@
 {
   "name": "vcolorpicker",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "type": "module",
   "description": "基于 Vue3 的颜色选择器",
   "main": "./lib/vcolorpicker.umd.cjs",

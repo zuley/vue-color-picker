@@ -1,4 +1,11 @@
+# Changelog
 
+# [2.3.0](https://github.com/zuley/vue-color-picker/compare/v2.2.0...v2.3.0) (2026-07-26)
+
+
+### Features
+
+* **color-picker:** teleport 支持、色板键盘导航与工程化全面优化 ([389475f](https://github.com/zuley/vue-color-picker/commit/389475f3319db396bbb3f31461ea5b81220528e1))
 
 # [2.2.0](https://github.com/zuley/vue-color-picker/compare/v2.1.0...v2.2.0) (2025-05-25)
 
