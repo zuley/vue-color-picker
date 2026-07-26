@@ -40,6 +40,34 @@ const CHINESE_FAQ = [
     answer: '支持。点击更多颜色时，会在兼容浏览器中调用 HTML5 原生 color input。'
   }
 ] as const
+const JAPANESE_FAQ = [
+  {
+    question: 'vColorPicker は Vue 3 に対応していますか？',
+    answer: 'はい。vColorPicker は Vue 3 プロジェクト向けに設計されており、標準的な v-model で利用できます。'
+  },
+  {
+    question: 'パネルの文言や言語をカスタマイズできますか？',
+    answer: 'はい。locale プロパティで zh-CN、en-US、ja-JP を指定でき、messages プロパティで組み込みラベルを上書きできます。'
+  },
+  {
+    question: 'TypeScript で使えますか？',
+    answer: 'はい。パッケージにはコンポーネントの props とプラグイン登録の TypeScript 型宣言が含まれています。'
+  },
+  {
+    question: 'ブラウザネイティブのカラーピッカーには対応していますか？',
+    answer: 'はい。「その他のカラー」を選ぶと、対応ブラウザではネイティブの HTML5 color input が開きます。'
+  }
+] as const
+
+type PageLang = 'en' | 'zh-CN' | 'ja-JP'
+
+const HOME_PATHS = ['/', '/zh/', '/ja/']
+
+const getPageLang = (canonicalPath: string): PageLang => {
+  if (canonicalPath.startsWith('/zh/')) return 'zh-CN'
+  if (canonicalPath.startsWith('/ja/')) return 'ja-JP'
+  return 'en'
+}
 
 const getCanonicalPath = (relativePath: string) => {
   const routePath = relativePath
@@ -54,30 +82,33 @@ const getCanonicalPath = (relativePath: string) => {
 }
 
 const getAlternateLinks = (canonicalPath: string): HeadConfig[] => {
-  const isChinesePage = canonicalPath.startsWith('/zh/')
-  const englishUrl = `${SITE_URL}/`
-  const chineseUrl = `${SITE_URL}/zh/`
-
-  if (canonicalPath === '/' || canonicalPath === '/zh/') {
+  if (HOME_PATHS.includes(canonicalPath)) {
     return [
-      ['link', { rel: 'alternate', hreflang: 'en', href: englishUrl }],
-      ['link', { rel: 'alternate', hreflang: 'zh-CN', href: chineseUrl }],
-      ['link', { rel: 'alternate', hreflang: 'x-default', href: englishUrl }]
+      ['link', { rel: 'alternate', hreflang: 'en', href: `${SITE_URL}/` }],
+      ['link', { rel: 'alternate', hreflang: 'zh-CN', href: `${SITE_URL}/zh/` }],
+      ['link', { rel: 'alternate', hreflang: 'ja', href: `${SITE_URL}/ja/` }],
+      ['link', { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/` }]
     ]
   }
 
+  const hreflang = getPageLang(canonicalPath) === 'ja-JP' ? 'ja' : getPageLang(canonicalPath)
   return [
-    ['link', { rel: 'alternate', hreflang: isChinesePage ? 'zh-CN' : 'en', href: `${SITE_URL}${canonicalPath}` }]
+    ['link', { rel: 'alternate', hreflang, href: `${SITE_URL}${canonicalPath}` }]
   ]
 }
 
 const getStructuredData = (canonicalPath: string, title: string, description: string): HeadConfig[] => {
-  if (canonicalPath !== '/' && canonicalPath !== '/zh/') {
+  if (!HOME_PATHS.includes(canonicalPath)) {
     return []
   }
 
-  const isChinesePage = canonicalPath === '/zh/'
-  const faqEntries = isChinesePage ? CHINESE_FAQ : ENGLISH_FAQ
+  const pageLang = getPageLang(canonicalPath)
+  const faqMap: Record<PageLang, typeof ENGLISH_FAQ | typeof CHINESE_FAQ | typeof JAPANESE_FAQ> = {
+    'en': ENGLISH_FAQ,
+    'zh-CN': CHINESE_FAQ,
+    'ja-JP': JAPANESE_FAQ
+  }
+  const faqEntries = faqMap[pageLang]
   const pageUrl = `${SITE_URL}${canonicalPath}`
   const structuredData = [
     {
@@ -85,7 +116,7 @@ const getStructuredData = (canonicalPath: string, title: string, description: st
       '@type': 'WebSite',
       name: title,
       url: SITE_URL,
-      inLanguage: isChinesePage ? 'zh-CN' : 'en'
+      inLanguage: pageLang === 'en' ? 'en' : pageLang
     },
     {
       '@context': 'https://schema.org',
@@ -180,6 +211,25 @@ export default defineConfig({
           label: '页面导航'
         }
       }
+    },
+    ja: {
+      label: '日本語',
+      lang: 'ja-JP',
+      title: 'vColorPicker',
+      description: 'Vue 3 向けカラーピッカーコンポーネント',
+      link: '/ja/',
+      themeConfig: {
+        nav: [
+          { text: 'ホーム', link: '/ja/' },
+          { text: 'GitHub', link: 'https://github.com/zuley/vue-color-picker' }
+        ],
+        footer: {
+          message: '作者：<a href="https://rxshc.com/" target="_blank" rel="noreferrer">rxshc.com</a>'
+        },
+        outline: {
+          label: 'このページ'
+        }
+      }
     }
   },
 
@@ -189,12 +239,13 @@ export default defineConfig({
       return items
         .filter(item => !item.url.endsWith('/404.html'))
         .map(item => {
-          if (item.url === `${SITE_URL}/` || item.url === `${SITE_URL}/zh/`) {
+          if (HOME_PATHS.some(path => item.url === `${SITE_URL}${path}`)) {
             return {
               ...item,
               links: [
                 { lang: 'en', hreflang: 'en', url: `${SITE_URL}/` },
-                { lang: 'zh-CN', hreflang: 'zh-CN', url: `${SITE_URL}/zh/` }
+                { lang: 'zh-CN', hreflang: 'zh-CN', url: `${SITE_URL}/zh/` },
+                { lang: 'ja-JP', hreflang: 'ja', url: `${SITE_URL}/ja/` }
               ]
             }
           }
@@ -207,10 +258,18 @@ export default defineConfig({
   transformHead({ pageData, title, description }): HeadConfig[] {
     const canonicalPath = getCanonicalPath(pageData.relativePath)
     const canonicalUrl = `${SITE_URL}${canonicalPath}`
-    const isChinesePage = canonicalPath.startsWith('/zh/')
-    const keywords = isChinesePage
-      ? 'Vue3 颜色选择器, Vue color picker, vColorPicker, 前端组件'
-      : 'Vue 3 color picker, Vue color picker component, vColorPicker, frontend UI component'
+    const pageLang = getPageLang(canonicalPath)
+    const keywordsMap: Record<PageLang, string> = {
+      'zh-CN': 'Vue3 颜色选择器, Vue color picker, vColorPicker, 前端组件',
+      'ja-JP': 'Vue 3 カラーピッカー, Vue color picker, vColorPicker, フロントエンドコンポーネント',
+      'en': 'Vue 3 color picker, Vue color picker component, vColorPicker, frontend UI component'
+    }
+    const keywords = keywordsMap[pageLang]
+    const ogLocaleMap: Record<PageLang, string> = {
+      'zh-CN': 'zh_CN',
+      'ja-JP': 'ja_JP',
+      'en': 'en_US'
+    }
 
     return [
       ['link', { rel: 'canonical', href: canonicalUrl }],
@@ -220,7 +279,7 @@ export default defineConfig({
       ['meta', { property: 'og:url', content: canonicalUrl }],
       ['meta', { property: 'og:image', content: DEFAULT_OG_IMAGE }],
       ['meta', { property: 'og:image:alt', content: 'vColorPicker preview image' }],
-      ['meta', { property: 'og:locale', content: isChinesePage ? 'zh_CN' : 'en_US' }],
+      ['meta', { property: 'og:locale', content: ogLocaleMap[pageLang] }],
       ['meta', { name: 'twitter:title', content: title }],
       ['meta', { name: 'twitter:description', content: description }],
       ['meta', { name: 'twitter:image', content: DEFAULT_OG_IMAGE }],
