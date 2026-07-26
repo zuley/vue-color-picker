@@ -3,11 +3,9 @@ import type { ComponentPublicInstance, DefineComponent, Plugin } from 'vue'
 /**
  * Public type surface for npm consumers.
  *
- * NOTE: these shapes must stay in sync with
- * `packages/color-picker/src/types.ts` (the canonical source used by the
- * .vue component itself). The duplication exists because only the files
- * listed in `package.json#files` ship to npm, and `packages/` is not one
- * of them.
+ * This is the canonical declaration file (the only one shipped to npm);
+ * `packages/color-picker/src/types.ts` re-exports the shared shapes from
+ * here, so the two can never drift apart.
  */
 
 export type ColorPickerLocale = 'zh-CN' | 'en-US' | 'ja-JP'
@@ -36,6 +34,8 @@ export interface ColorPickerProps {
   locale?: ColorPickerLocale
   messages?: Partial<ColorPickerMessages>
   placement?: ColorPickerPlacement
+  /** Render the panel into a container (true = body) to escape overflow clipping */
+  teleport?: boolean | string
 }
 
 export interface ColorPickerEmits {

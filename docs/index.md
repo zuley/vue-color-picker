@@ -71,6 +71,15 @@ The panel auto-detects available viewport space by default. You can lock it to a
 <colorPicker v-model="color" placement="bottom" /> <!-- vertical locked, horizontal auto -->
 ```
 
+## Teleport
+
+When the picker sits inside a container with `overflow: hidden` (tables, dialogs, cards), the panel can get clipped. Set `teleport` to render the panel into `document.body` (or any CSS selector) with fixed positioning that tracks the trigger on scroll and resize.
+
+```vue
+<colorPicker v-model="color" teleport />
+<colorPicker v-model="color" teleport="#popup-root" />
+```
+
 ## Installation
 
 ```bash
@@ -114,6 +123,7 @@ const color = ref('#ff0000')
 | `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | Auto | Built-in panel labels; follows `<html lang>` / `navigator.language` when omitted |
 | `messages` | `Partial<ColorPickerMessages>` | — | Override built-in labels with custom text |
 | `placement` | `ColorPickerPlacement` | `'auto'` | Panel placement: `'auto'`, `'top'`, `'bottom'`, `'top-start'`, `'top-end'`, `'bottom-start'`, `'bottom-end'`. `'auto'` picks based on available viewport space; directional values lock that axis |
+| `teleport` | `boolean \| string` | `false` | Render the panel into `body` (`true`) or a CSS selector target, escaping `overflow: hidden` ancestors |
 
 ## Events
 
@@ -158,8 +168,8 @@ const openProgrammatically = () => pickerRef.value?.open()
 
 ## Accessibility
 
-- Trigger button and every swatch are reachable via `Tab`
-- `Enter` / `Space` activates; `↑` / `↓` on a focused trigger also opens the panel
+- Trigger button is reachable via `Tab`; `Enter` / `Space` activates; `↑` / `↓` on a focused trigger opens the panel and focuses the first swatch
+- The swatch grid uses a roving tabindex: `Tab` enters the grid once, then `←` `→` `↑` `↓` move between swatches, `Home` / `End` jump within a row, `Enter` / `Space` selects
 - `Esc` closes the panel and returns focus to the trigger
 - Trigger carries `role="button"`, `aria-haspopup="dialog"`, `aria-expanded`; the panel uses `role="dialog"`; every swatch has `aria-label="#RRGGBB"`
 - Focus rings use `:focus-visible`, so mouse users are not distracted
@@ -199,6 +209,8 @@ Example — dark theme:
   --vcp-text-color: #eee;
 }
 ```
+
+> With `teleport` enabled the panel is no longer a descendant of `.m-colorPicker`, so also override `.m-colorPicker-box` (the panel root) — or define the variables on `:root` to cover both.
 
 ## TypeScript
 

@@ -104,6 +104,7 @@ Vue.use(vcolorpicker)
 | `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | 自动检测 | 面板内置文案语言；不传时跟随 `<html lang>` / `navigator.language` |
 | `messages` | `Partial<ColorPickerMessages>` | — | 自定义文案对象，覆盖 `defaultColor` / `themeColors` / `standardColors` / `moreColors` |
 | `placement` | `ColorPickerPlacement` | `'auto'` | 面板位置：`'auto'` / `'top'` / `'bottom'` / `'top-start'` / `'top-end'` / `'bottom-start'` / `'bottom-end'`。`'auto'` 根据视口剩余空间自动决定；带方向时锁定对应轴 |
+| `teleport` | `boolean \| string` | `false` | 把面板渲染到 `body`（`true`）或 CSS 选择器指定的容器，避免被祖先 `overflow: hidden` 裁剪 |
 
 ## 事件
 
@@ -148,8 +149,8 @@ const openProgrammatically = () => pickerRef.value?.open()
 
 ## 可访问性（a11y）
 
-- 触发按钮和所有色块都可通过 `Tab` 聚焦
-- `Enter` / `Space` 激活；触发按钮聚焦时按 `↑` / `↓` 也可打开面板
+- 触发按钮可通过 `Tab` 聚焦；`Enter` / `Space` 激活；触发按钮聚焦时按 `↑` / `↓` 打开面板并聚焦第一个色块
+- 色块网格采用漫游焦点（roving tabindex）：`Tab` 一次进入网格，之后用 `←` `→` `↑` `↓` 在色块间移动，`Home` / `End` 跳到行首 / 行尾，`Enter` / `Space` 选中
 - 面板打开后按 `Esc` 关闭并把焦点送回触发按钮
 - 触发按钮带 `role="button"` + `aria-haspopup="dialog"` + `aria-expanded`，面板带 `role="dialog"`，每个色块带 `aria-label="#RRGGBB"`
 - 焦点环使用 `:focus-visible`，鼠标用户不会被打扰
