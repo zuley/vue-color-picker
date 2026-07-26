@@ -71,6 +71,15 @@ const topColor = ref('#f59e0b')
 <colorPicker v-model="color" placement="bottom" /> <!-- 锁定向下，水平自动 -->
 ```
 
+## Teleport 传送
+
+当组件位于 `overflow: hidden` 的容器（表格、弹窗、卡片）内时，面板可能被裁剪。设置 `teleport` 可把面板渲染到 `document.body`（或任意 CSS 选择器目标），使用 fixed 定位并在滚动 / 缩放时自动跟随触发器。
+
+```vue
+<colorPicker v-model="color" teleport />
+<colorPicker v-model="color" teleport="#popup-root" />
+```
+
 <div id="installation"></div>
 
 ## 安装
@@ -116,6 +125,7 @@ const color = ref('#ff0000')
 | `locale` | `'zh-CN' \| 'en-US' \| 'ja-JP'` | 自动检测 | 面板内置文案语言；不传时跟随 `<html lang>` / `navigator.language` |
 | `messages` | `Partial<ColorPickerMessages>` | — | 用自定义文案覆盖内置语言包 |
 | `placement` | `ColorPickerPlacement` | `'auto'` | 面板位置：`'auto'` / `'top'` / `'bottom'` / `'top-start'` / `'top-end'` / `'bottom-start'` / `'bottom-end'`。`'auto'` 根据视口剩余空间自动决定；带方向时锁定对应轴 |
+| `teleport` | `boolean \| string` | `false` | 把面板渲染到 `body`（`true`）或 CSS 选择器指定的容器，避免被祖先 `overflow: hidden` 裁剪 |
 
 ## 事件
 
@@ -160,8 +170,8 @@ const openProgrammatically = () => pickerRef.value?.open()
 
 ## 可访问性 (a11y)
 
-- 触发按钮和所有色块都可通过 `Tab` 聚焦
-- `Enter` / `Space` 激活；触发按钮聚焦时按 `↑` / `↓` 也可打开面板
+- 触发按钮可通过 `Tab` 聚焦；`Enter` / `Space` 激活；触发按钮聚焦时按 `↑` / `↓` 打开面板并聚焦第一个色块
+- 色块网格采用漫游焦点（roving tabindex）：`Tab` 一次进入网格，之后用 `←` `→` `↑` `↓` 在色块间移动，`Home` / `End` 跳到行首 / 行尾，`Enter` / `Space` 选中
 - 面板打开后按 `Esc` 关闭并把焦点送回触发按钮
 - 触发按钮带 `role="button"` + `aria-haspopup="dialog"` + `aria-expanded`；面板带 `role="dialog"`；每个色块带 `aria-label="#RRGGBB"`
 - 焦点环使用 `:focus-visible`，鼠标用户不会被打扰
@@ -201,6 +211,8 @@ const openProgrammatically = () => pickerRef.value?.open()
   --vcp-text-color: #eee;
 }
 ```
+
+> 开启 `teleport` 后面板不再是 `.m-colorPicker` 的后代节点，主题变量需要同时覆盖 `.m-colorPicker-box`（面板根节点），或直接定义在 `:root` 上一次覆盖两者。
 
 ## TypeScript
 

@@ -11,7 +11,7 @@ const ENGLISH_FAQ = [
   },
   {
     question: 'Can I customize the panel text or change the language?',
-    answer: 'Yes. You can set the locale prop to zh-CN or en-US, and you can override built-in labels with the messages prop.'
+    answer: 'Yes. You can set the locale prop to zh-CN, en-US or ja-JP, and you can override built-in labels with the messages prop.'
   },
   {
     question: 'Does the color picker work with TypeScript?',
@@ -29,7 +29,7 @@ const CHINESE_FAQ = [
   },
   {
     question: '可以切换中英文或者自定义面板文案吗？',
-    answer: '可以。你可以通过 locale 设置 zh-CN 或 en-US，也可以通过 messages 覆盖默认文案。'
+    answer: '可以。你可以通过 locale 设置 zh-CN、en-US 或 ja-JP，也可以通过 messages 覆盖默认文案。'
   },
   {
     question: '这个组件支持 TypeScript 吗？',
